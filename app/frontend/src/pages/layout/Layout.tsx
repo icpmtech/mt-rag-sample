@@ -37,11 +37,11 @@ const Layout = () => {
 
     return (
         <div className={styles.layout}>
-            <header className={styles.header} role={"banner"}>
+            <header className={styles.header} role="banner">
                 <div className={styles.headerContainer} ref={menuRef}>
                     <Link to="/" className={styles.headerTitleContainer}>
                         <img src={motaEngilLogo} alt="Mota Engil Logo" className={styles.headerLogo} />
-                        <h3 className={styles.headerTitle}>{t("headerTitle")}</h3>
+                        <h3 className={styles.headerTitle}>Assistente Mota Engil</h3>
                     </Link>
                     <nav>
                         <ul className={`${styles.headerNavList} ${menuOpen ? styles.show : ""}`}>
@@ -51,7 +51,7 @@ const Layout = () => {
                                     className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}
                                     onClick={() => setMenuOpen(false)}
                                 >
-                                    {t("chat")}
+                                    Chat
                                 </NavLink>
                             </li>
                             <li>
@@ -60,7 +60,7 @@ const Layout = () => {
                                     className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}
                                     onClick={() => setMenuOpen(false)}
                                 >
-                                    {t("qa")}
+                                    Ask a question
                                 </NavLink>
                             </li>
                         </ul>

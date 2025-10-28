@@ -1,13 +1,86 @@
 .container {
     flex: 1;
     display: flex;
+    flex-direction: row;
+    height: 100%;
+    background: #f7f7f8;
+}
+
+.sidebar {
+    width: 260px;
+    background: #ffffff;
+    border-right: 1px solid #e5e5e5;
+    display: flex;
     flex-direction: column;
-    margin-top: 1rem;
+    padding: 1rem;
+}
+
+.sidebarHeader {
+    margin-bottom: 1rem;
+}
+
+.logoContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+}
+
+.sidebarLogo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.newChatButton {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: #f7f7f8;
+    border: 1px solid #e5e5e5;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #374151;
+    transition: background-color 0.2s;
+}
+
+.newChatButton:hover {
+    background: #e5e5e5;
+}
+
+.plusIcon {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.sidebarContent {
+    flex: 1;
+}
+
+.sidebarFooter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.historyButtonSidebar {
+    margin-bottom: 0.5rem;
 }
 
 .chatRoot {
     flex: 1;
     display: flex;
+    background: #ffffff;
+    margin: 0.75rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chatRootWithHistory {
+    margin-left: 300px;
 }
 
 .chatContainer {
@@ -16,7 +89,10 @@
     flex-direction: column;
     align-items: center;
     width: 100%;
-    max-height: calc(100vh - 10rem);
+    max-width: 48rem;
+    margin: 0 auto;
+    height: 100%;
+    position: relative;
 }
 
 .chatEmptyState {
@@ -25,32 +101,32 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    max-height: 64rem;
-    padding-top: 1rem;
+    text-align: center;
+    padding: 2rem;
 }
 
 .chatEmptyStateTitle {
-    font-size: 2.75rem;
+    font-size: 2rem;
     font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 1.875rem;
+    margin: 1rem 0;
+    color: #374151;
 }
 
 .chatEmptyStateSubtitle {
-    font-weight: 600;
-    margin-bottom: 0.625rem;
+    font-weight: 400;
+    margin-bottom: 2rem;
+    color: #6b7280;
+    font-size: 1rem;
 }
 
 .chatMessageStream {
     flex-grow: 1;
-    max-height: 64rem;
     width: 100%;
     overflow-y: auto;
-    padding: 0 2rem;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    resize: horizontal;
-    min-width: 50vw;
+    margin-bottom: 7rem;
 }
 
 .chatMessageGpt {
@@ -65,13 +141,13 @@
 }
 
 .chatInput {
-    position: sticky;
-    bottom: 0;
-    flex: 0 0 6.25rem;
-    padding: 1rem;
-    width: 100%;
-    max-width: 64.25rem;
-    background: #f2f2f2;
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    padding: 0;
+    width: auto;
+    background: transparent;
 }
 
 .chatAnalysisPanel {
@@ -92,51 +168,29 @@
     font-size: 1.75rem;
 }
 
-.commandsSplitContainer {
-    display: flex;
-    justify-content: space-between;
-}
-
-.commandsContainer {
-    display: flex;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    align-self: flex-end;
-}
-
 .commandButton {
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .container {
+        flex-direction: column;
+    }
+
+    .chatRoot {
+        margin: 0;
+        border-radius: 0;
+    }
 }
 
 @media (min-width: 992px) {
-    .container {
-        margin-top: 1.25rem;
-    }
-
-    .chatEmptyState {
-        padding-top: 3.75rem;
-    }
-
     .chatEmptyStateTitle {
-        font-size: 4rem;
-    }
-
-    .chatInput {
-        padding: 0.75rem 1.5rem 1.5rem;
-    }
-
-    .commandsSplitContainer {
-        padding-left: 1rem;
-    }
-
-    .commandsContainer {
-        padding-left: 0rem;
-        padding-right: 0rem;
-    }
-
-    .commandButton {
-        margin-right: 1.25rem;
-        margin-bottom: 1.25rem;
+        font-size: 2.25rem;
     }
 
     .chatMessageGpt {
