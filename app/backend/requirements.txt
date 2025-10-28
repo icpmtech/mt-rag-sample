@@ -273,7 +273,7 @@ opentelemetry-instrumentation-requests==0.57b0
     # via azure-monitor-opentelemetry
 opentelemetry-instrumentation-urllib==0.57b0
     # via azure-monitor-opentelemetry
-opentelemetry-instrumentation-urllib3==0.57b0
+opentelemetry-instrumentation-urllib3==0.59b0
     # via azure-monitor-opentelemetry
 opentelemetry-instrumentation-wsgi==0.57b0
     # via
