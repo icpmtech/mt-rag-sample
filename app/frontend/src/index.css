@@ -1,9 +1,20 @@
+:root {
+    /* Mota Engil Brand Colors */
+    --mota-engil-blue: #003366;
+    --mota-engil-blue-light: #0066cc;
+    --mota-engil-blue-dark: #001f3d;
+    --mota-engil-gray: #4a4a4a;
+    --mota-engil-gray-light: #f5f5f5;
+    --mota-engil-white: #ffffff;
+    --mota-engil-accent: #0088cc;
+}
+
 * {
     box-sizing: border-box;
 }
 
 html {
-    background: #f2f2f2;
+    background: var(--mota-engil-gray-light);
     font-size: 12px; /* Root font size for 320px width screens */
     font-family:
         "Segoe UI",

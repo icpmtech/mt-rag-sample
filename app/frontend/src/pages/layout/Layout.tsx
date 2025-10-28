@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, RefObject } from "react";
 import { Outlet, NavLink, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import styles from "./Layout.module.css";
+import motaEngilLogo from "../../assets/mota-engil-logo.jpg";
 
 import { useLogin } from "../../authConfig";
 
@@ -39,6 +40,7 @@ const Layout = () => {
             <header className={styles.header} role={"banner"}>
                 <div className={styles.headerContainer} ref={menuRef}>
                     <Link to="/" className={styles.headerTitleContainer}>
+                        <img src={motaEngilLogo} alt="Mota Engil Logo" className={styles.headerLogo} />
                         <h3 className={styles.headerTitle}>{t("headerTitle")}</h3>
                     </Link>
                     <nav>
