@@ -87,11 +87,17 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, init
                 onCompositionEnd={handleCompositionEnd}
             />
             <div className={styles.questionInputButtonsContainer}>
+                {showSpeechInput && <SpeechInput updateQuestion={setQuestion} />}
                 <Tooltip content={t("tooltips.submitQuestion")} relationship="label">
-                    <Button size="large" icon={<Send28Filled primaryFill="rgba(115, 118, 225, 1)" />} disabled={sendQuestionDisabled} onClick={sendQuestion} />
+                    <Button
+                        size="large"
+                        icon={<Send28Filled primaryFill={sendQuestionDisabled ? "rgba(158, 158, 158, 1)" : "rgba(25, 118, 210, 1)"} />}
+                        disabled={sendQuestionDisabled}
+                        onClick={sendQuestion}
+                        className={styles.sendButton}
+                    />
                 </Tooltip>
             </div>
-            {showSpeechInput && <SpeechInput updateQuestion={setQuestion} />}
         </Stack>
     );
 };

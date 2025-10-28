@@ -34,13 +34,17 @@
     },
     "developerSettings": "Configurações do desenvolvedor",
 
-    "chatEmptyStateTitle": "Converse com seus dados",
+    "chatEmptyStateTitle": "Olá. De que é que devemos falar hoje?",
     "chatEmptyStateSubtitle": "Pergunte qualquer coisa ou tente um exemplo",
     "defaultExamples": {
-        "1": "O que está incluído no meu plano Northwind Health Plus que não está no padrão?",
-        "2": "O que acontece em uma avaliação de desempenho?",
-        "3": "O que faz um Gerente de Produto?",
-        "placeholder": "Digite uma nova pergunta (por exemplo: Meu plano cobre exames oftalmológicos anuais?)"
+        "1": "Criar uma imagem",
+        "2": "Simplifica um conceito", 
+        "3": "Escrever um primeiro rascunho",
+        "4": "Aprenda algo novo",
+        "5": "Faça uma aventura",
+        "6": "Cria um meme",
+        "7": "Joga trívia",
+        "placeholder": "Enviar Mensagem ao Copilot..."
     },
     "askTitle": "Pergunte aos seus dados",
     "multimodalExamples": {

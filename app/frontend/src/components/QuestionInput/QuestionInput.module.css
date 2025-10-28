@@ -1,27 +1,58 @@
 .questionInputContainer {
-    border-radius: 0.5rem;
-    box-shadow:
-        0px 0.5rem 1rem rgba(0, 0, 0, 0.14),
-        0px 0px 0.125rem rgba(0, 0, 0, 0.12);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-medium);
     width: 100%;
-    padding: 0.8rem;
-    background: var(--mota-engil-white);
-    border: 1px solid var(--mota-engil-gray-light);
+    padding: 1rem 1.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    position: relative;
 }
 
 .questionInputTextArea {
     width: 100%;
-    line-height: 2.5rem;
+    line-height: 1.5rem;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 1rem;
+    color: var(--text-primary);
+    resize: none;
+}
+
+.questionInputTextArea::placeholder {
+    color: var(--text-muted);
 }
 
 .questionInputButtonsContainer {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.sendButton {
+    background: transparent !important;
+    border: none !important;
+}
+
+.questionInputContainer:focus-within {
+    border-color: var(--accent-primary);
+    box-shadow:
+        var(--shadow-medium),
+        0 0 0 2px rgba(25, 118, 210, 0.1);
 }
 
 @media (min-width: 992px) {
     .questionInputContainer {
-        height: 5.625rem;
+        min-height: 3.5rem;
+    }
+
+    .questionInputTextArea {
+        font-size: 1.1rem;
+        padding-right: 4rem;
     }
 }

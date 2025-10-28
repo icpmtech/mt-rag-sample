@@ -397,29 +397,93 @@ const Chat = () => {
             <Helmet>
                 <title>{t("pageTitle")}</title>
             </Helmet>
-            <div className={styles.commandsSplitContainer}>
-                <div className={styles.commandsContainer}>
-                    {((useLogin && showChatHistoryCosmos) || showChatHistoryBrowser) && (
-                        <HistoryButton className={styles.commandButton} onClick={() => setIsHistoryPanelOpen(!isHistoryPanelOpen)} />
+
+            {/* Modern Sidebar */}
+            <div className={styles.sidebar}>
+                <div className={styles.sidebarHeader}>
+                    <div className={styles.logoContainer}>
+                        <img src={motaEngilLogo} alt="Mota Engil Logo" className={styles.sidebarLogo} />
+                    </div>
+                </div>
+
+                <div className={styles.sidebarContent}>
+                    <div className={`${styles.sidebarIcon} ${styles.active}`} title="Chat">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                        </svg>
+                    </div>
+                    <div
+                        className={`${styles.sidebarIcon} ${!lastQuestionRef.current || isLoading ? styles.sidebarIconDisabled : ""}`}
+                        onClick={!lastQuestionRef.current || isLoading ? undefined : clearChat}
+                        title={t("clearChat")}
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                        </svg>
+                    </div>
+                    <div className={styles.sidebarIcon} title="Explore">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                    </div>
+                    <div className={styles.sidebarIcon} title="Create">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                        </svg>
+                    </div>
+                    {showUserUpload && (
+                        <div className={`${styles.sidebarIcon} ${!loggedIn ? styles.sidebarIconDisabled : ""}`} title="Upload File">
+                            <UploadFile className={styles.uploadButton} disabled={!loggedIn} />
+                        </div>
                     )}
                 </div>
-                <div className={styles.commandsContainer}>
-                    <ClearChatButton className={styles.commandButton} onClick={clearChat} disabled={!lastQuestionRef.current || isLoading} />
-                    {showUserUpload && <UploadFile className={styles.commandButton} disabled={!loggedIn} />}
-                    <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
+
+                <div className={styles.sidebarFooter}>
+                    {((useLogin && showChatHistoryCosmos) || showChatHistoryBrowser) && (
+                        <div className={styles.sidebarIcon} onClick={() => setIsHistoryPanelOpen(!isHistoryPanelOpen)} title="History">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" />
+                            </svg>
+                        </div>
+                    )}
+                    <div className={styles.sidebarIcon} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} title="Settings">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z" />
+                        </svg>
+                    </div>
                 </div>
             </div>
-            <div className={styles.chatRoot} style={{ marginLeft: isHistoryPanelOpen ? "300px" : "0" }}>
+            <div className={`${styles.chatRoot} ${isHistoryPanelOpen ? styles.chatRootWithHistory : ""}`}>
                 <div className={styles.chatContainer}>
                     {!lastQuestionRef.current ? (
                         <div className={styles.chatEmptyState}>
-                            <img src={motaEngilLogo} alt="Mota Engil Logo" width="120" height="120" />
-
                             <h1 className={styles.chatEmptyStateTitle}>{t("chatEmptyStateTitle")}</h1>
                             <h2 className={styles.chatEmptyStateSubtitle}>{t("chatEmptyStateSubtitle")}</h2>
                             {showLanguagePicker && <LanguagePicker onLanguageChange={newLang => i18n.changeLanguage(newLang)} />}
 
-                            <ExampleList onExampleClicked={onExampleClicked} useMultimodalAnswering={showMultimodalOptions} />
+                            <div className={styles.suggestionButtons}>
+                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.1"))}>
+                                    {t("defaultExamples.1")}
+                                </div>
+                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.2"))}>
+                                    {t("defaultExamples.2")}
+                                </div>
+                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.3"))}>
+                                    {t("defaultExamples.3")}
+                                </div>
+                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.4"))}>
+                                    {t("defaultExamples.4")}
+                                </div>
+                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.5"))}>
+                                    {t("defaultExamples.5")}
+                                </div>
+                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.6"))}>
+                                    {t("defaultExamples.6")}
+                                </div>
+                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.7"))}>
+                                    {t("defaultExamples.7")}
+                                </div>
+                            </div>
                         </div>
                     ) : (
                         <div className={styles.chatMessageStream}>
