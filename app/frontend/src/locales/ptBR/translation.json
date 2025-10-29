@@ -6,6 +6,8 @@
     "login": "Entrar",
     "logout": "Sair",
     "clearChat": "Limpar chat",
+    "userProfile": "Perfil do Usuário",
+    "welcomeMessage": "Bem-vindo",
     "history": {
         "chatHistory": "Histórico do chat",
         "openChatHistory": "Abrir o histórico do chat",

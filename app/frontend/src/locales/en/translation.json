@@ -6,6 +6,8 @@
     "login": "Login",
     "logout": "Logout",
     "clearChat": "Clear chat",
+    "userProfile": "User Profile",
+    "welcomeMessage": "Welcome",
     "history": {
         "chatHistory": "Chat history",
         "openChatHistory": "Open chat history",

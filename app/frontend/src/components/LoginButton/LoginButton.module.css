@@ -1,6 +1,46 @@
+/* Mota Engil color variables */
+:root {
+    --mota-blue-dark: #003366;
+    --mota-blue: #0066cc;
+}
+
 .loginButton {
     border-radius: 0.3125em;
-    font-weight: 100;
+    font-weight: 500;
     margin: 0;
     padding: 0.5rem 1rem;
+    background-color: var(--mota-blue);
+    border-color: var(--mota-blue);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.loginButton:hover {
+    background-color: var(--mota-blue-dark);
+    border-color: var(--mota-blue-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.avatarContainer {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    padding: 4px;
+    border-radius: 50%;
+}
+
+.avatarContainer:hover {
+    transform: scale(1.05);
+    background-color: rgba(0, 102, 204, 0.1);
+}
+
+.loginAvatar {
+    transition: all 0.2s ease;
+}
+
+.avatarContainer:hover .loginAvatar {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }

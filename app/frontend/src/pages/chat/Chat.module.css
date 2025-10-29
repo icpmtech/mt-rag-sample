@@ -1,126 +1,9 @@
 .container {
     flex: 1;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     height: 100vh;
     background: var(--bg-primary);
-}
-
-.sidebar {
-    width: 64px;
-    background: var(--bg-sidebar-gradient);
-    border-right: 1px solid var(--border-light);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: var(--space-lg) var(--space-sm);
-    position: relative;
-    box-shadow: var(--shadow-sm);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-}
-
-.sidebarHeader {
-    margin-bottom: 1.5rem;
-}
-
-.logoContainer {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    padding: 0.5rem;
-}
-
-.sidebarLogo {
-    height: 28px;
-    width: 28px;
-    object-fit: contain;
-    border-radius: 6px;
-}
-
-.sidebarIcon {
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--duration-normal) var(--ease-out);
-    margin-bottom: var(--space-sm);
-    color: var(--text-secondary);
-    background: transparent;
-    position: relative;
-    overflow: hidden;
-}
-
-.sidebarIcon::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--bg-secondary);
-    border-radius: inherit;
-    opacity: 0;
-    transition: opacity var(--duration-normal) var(--ease-out);
-    z-index: -1;
-}
-
-.sidebarIcon:hover::before {
-    opacity: 1;
-}
-
-.sidebarIcon:hover {
-    color: var(--text-primary);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
-
-.sidebarIcon.active {
-    background: var(--accent-primary);
-    color: white;
-    box-shadow: var(--shadow-lg);
-}
-
-.sidebarIcon.active::before {
-    opacity: 0;
-}
-
-.sidebarIcon:active {
-    transform: translateY(0);
-    transition: transform var(--duration-fast) var(--ease-in);
-}
-
-.sidebarIconDisabled {
-    opacity: 0.5;
-    cursor: not-allowed !important;
-}
-
-.sidebarIconDisabled:hover {
-    background: transparent !important;
-    color: var(--text-secondary) !important;
-}
-
-.uploadButton {
-    background: transparent !important;
-    border: none !important;
-    color: inherit;
-    width: 20px;
-    height: 20px;
-}
-
-.sidebarContent {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.sidebarFooter {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
 }
 
 .chatRoot {
@@ -291,7 +174,7 @@
     box-shadow: var(--shadow-sm);
 }
 
-/* Staggered animation delays */
+/* Staggered animation delays for suggestion buttons */
 .animateDelay1 {
     animation-delay: 0.1s;
 }
@@ -315,21 +198,6 @@
 }
 
 @media (max-width: 768px) {
-    .sidebar {
-        width: 56px;
-        padding: 0.5rem 0.25rem;
-    }
-
-    .sidebarLogo {
-        height: 24px;
-        width: 24px;
-    }
-
-    .sidebarIcon {
-        width: 36px;
-        height: 36px;
-    }
-
     .chatInput {
         width: calc(100% - 1rem);
         left: 0.5rem;

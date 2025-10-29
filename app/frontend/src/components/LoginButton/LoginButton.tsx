@@ -6,21 +6,31 @@ import styles from "./LoginButton.module.css";
 import { getRedirectUri, loginRequest, appServicesLogout, getUsername, checkLoggedIn } from "../../authConfig";
 import { useState, useEffect, useContext } from "react";
 import { LoginContext } from "../../loginContext";
+import { UserAvatar } from "../UserAvatar";
+import { UserOffcanvas } from "../UserOffcanvas";
 
 export const LoginButton = () => {
     const { instance } = useMsal();
     const { loggedIn, setLoggedIn } = useContext(LoginContext);
     const activeAccount = instance.getActiveAccount();
     const [username, setUsername] = useState("");
+    const [userEmail, setUserEmail] = useState("");
+    const [isOffcanvasOpen, setIsOffcanvasOpen] = useState(false);
     const { t } = useTranslation();
 
     useEffect(() => {
-        const fetchUsername = async () => {
-            setUsername((await getUsername(instance)) ?? "");
+        const fetchUserData = async () => {
+            const fetchedUsername = (await getUsername(instance)) ?? "";
+            setUsername(fetchedUsername);
+
+            // Get user email from active account
+            if (activeAccount?.username) {
+                setUserEmail(activeAccount.username);
+            }
         };
 
-        fetchUsername();
-    }, []);
+        fetchUserData();
+    }, [activeAccount]);
 
     const handleLoginPopup = () => {
         /**
@@ -36,9 +46,16 @@ export const LoginButton = () => {
             .catch(error => console.log(error))
             .then(async () => {
                 setLoggedIn(await checkLoggedIn(instance));
-                setUsername((await getUsername(instance)) ?? "");
+                const fetchedUsername = (await getUsername(instance)) ?? "";
+                setUsername(fetchedUsername);
+
+                const newActiveAccount = instance.getActiveAccount();
+                if (newActiveAccount?.username) {
+                    setUserEmail(newActiveAccount.username);
+                }
             });
     };
+
     const handleLogoutPopup = () => {
         if (activeAccount) {
             instance
@@ -50,16 +67,54 @@ export const LoginButton = () => {
                 .then(async () => {
                     setLoggedIn(await checkLoggedIn(instance));
                     setUsername((await getUsername(instance)) ?? "");
+                    setUserEmail("");
+                    setIsOffcanvasOpen(false);
                 });
         } else {
             appServicesLogout();
+            setIsOffcanvasOpen(false);
         }
     };
+
+    const handleAvatarClick = () => {
+        setIsOffcanvasOpen(true);
+    };
+
+    const handleOffcanvasDismiss = () => {
+        setIsOffcanvasOpen(false);
+    };
+
+    if (loggedIn) {
+        return (
+            <>
+                <div className={styles.avatarContainer} onClick={handleAvatarClick}>
+                    <UserAvatar username={username} size="medium" isOnline={true} className={styles.loginAvatar} />
+                </div>
+                <UserOffcanvas
+                    isOpen={isOffcanvasOpen}
+                    onDismiss={handleOffcanvasDismiss}
+                    username={username}
+                    userEmail={userEmail}
+                    isLoggedIn={loggedIn}
+                    onLogin={handleLoginPopup}
+                    onLogout={handleLogoutPopup}
+                />
+            </>
+        );
+    }
+
     return (
-        <DefaultButton
-            text={loggedIn ? `${t("logout")}\n${username}` : `${t("login")}`}
-            className={styles.loginButton}
-            onClick={loggedIn ? handleLogoutPopup : handleLoginPopup}
-        ></DefaultButton>
+        <>
+            <DefaultButton text={t("login")} className={styles.loginButton} onClick={handleLoginPopup} />
+            <UserOffcanvas
+                isOpen={isOffcanvasOpen}
+                onDismiss={handleOffcanvasDismiss}
+                username=""
+                userEmail=""
+                isLoggedIn={false}
+                onLogin={handleLoginPopup}
+                onLogout={handleLogoutPopup}
+            />
+        </>
     );
 };

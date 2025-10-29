@@ -1,0 +1,107 @@
+.avatar {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 600;
+    text-align: center;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.avatar.small {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+}
+
+.avatar.medium {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+}
+
+.avatar.large {
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+}
+
+.avatar.clickable {
+    cursor: pointer;
+}
+
+.avatar.clickable:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.avatar.clickable:active {
+    transform: scale(0.98);
+}
+
+.initials {
+    color: white;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.onlineIndicator {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background: #00c851;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Color classes for different avatar colors */
+.avatar.color1 {
+    background-color: #ff6b6b;
+}
+.avatar.color2 {
+    background-color: #4ecdc4;
+}
+.avatar.color3 {
+    background-color: #45b7d1;
+}
+.avatar.color4 {
+    background-color: #96ceb4;
+}
+.avatar.color5 {
+    background-color: #ffeaa7;
+}
+.avatar.color6 {
+    background-color: #dda0dd;
+}
+.avatar.color7 {
+    background-color: #98d8c8;
+}
+.avatar.color8 {
+    background-color: #f7dc6f;
+}
+.avatar.color9 {
+    background-color: #bb8fce;
+}
+.avatar.color10 {
+    background-color: #85c1e9;
+}
+.avatar.color11 {
+    background-color: #f8c471;
+}
+.avatar.color12 {
+    background-color: #82e0aa;
+}
+
+/* Mota Engil colors */
+.avatar.motaEngil {
+    background: linear-gradient(135deg, #cc3333 0%, #ff4444 100%);
+}
