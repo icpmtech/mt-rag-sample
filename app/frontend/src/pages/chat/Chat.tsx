@@ -462,25 +462,25 @@ const Chat = () => {
                             {showLanguagePicker && <LanguagePicker onLanguageChange={newLang => i18n.changeLanguage(newLang)} />}
 
                             <div className={styles.suggestionButtons}>
-                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.1"))}>
+                                <div className={`${styles.suggestionButton} ${styles.animateDelay1}`} onClick={() => onExampleClicked(t("defaultExamples.1"))}>
                                     {t("defaultExamples.1")}
                                 </div>
-                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.2"))}>
+                                <div className={`${styles.suggestionButton} ${styles.animateDelay2}`} onClick={() => onExampleClicked(t("defaultExamples.2"))}>
                                     {t("defaultExamples.2")}
                                 </div>
-                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.3"))}>
+                                <div className={`${styles.suggestionButton} ${styles.animateDelay3}`} onClick={() => onExampleClicked(t("defaultExamples.3"))}>
                                     {t("defaultExamples.3")}
                                 </div>
-                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.4"))}>
+                                <div className={`${styles.suggestionButton} ${styles.animateDelay4}`} onClick={() => onExampleClicked(t("defaultExamples.4"))}>
                                     {t("defaultExamples.4")}
                                 </div>
-                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.5"))}>
+                                <div className={`${styles.suggestionButton} ${styles.animateDelay5}`} onClick={() => onExampleClicked(t("defaultExamples.5"))}>
                                     {t("defaultExamples.5")}
                                 </div>
-                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.6"))}>
+                                <div className={`${styles.suggestionButton} ${styles.animateDelay6}`} onClick={() => onExampleClicked(t("defaultExamples.6"))}>
                                     {t("defaultExamples.6")}
                                 </div>
-                                <div className={styles.suggestionButton} onClick={() => onExampleClicked(t("defaultExamples.7"))}>
+                                <div className={`${styles.suggestionButton} ${styles.animateDelay7}`} onClick={() => onExampleClicked(t("defaultExamples.7"))}>
                                     {t("defaultExamples.7")}
                                 </div>
                             </div>

@@ -8,13 +8,16 @@
 
 .sidebar {
     width: 64px;
-    background: var(--bg-sidebar);
+    background: var(--bg-sidebar-gradient);
     border-right: 1px solid var(--border-light);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1rem 0.5rem;
+    padding: var(--space-lg) var(--space-sm);
     position: relative;
+    box-shadow: var(--shadow-sm);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 }
 
 .sidebarHeader {
@@ -38,25 +41,53 @@
 .sidebarIcon {
     width: 40px;
     height: 40px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: 0.5rem;
+    transition: all var(--duration-normal) var(--ease-out);
+    margin-bottom: var(--space-sm);
     color: var(--text-secondary);
     background: transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebarIcon::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--bg-secondary);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-out);
+    z-index: -1;
+}
+
+.sidebarIcon:hover::before {
+    opacity: 1;
 }
 
 .sidebarIcon:hover {
-    background: var(--bg-secondary);
     color: var(--text-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
 .sidebarIcon.active {
     background: var(--accent-primary);
     color: white;
+    box-shadow: var(--shadow-lg);
+}
+
+.sidebarIcon.active::before {
+    opacity: 0;
+}
+
+.sidebarIcon:active {
+    transform: translateY(0);
+    transition: transform var(--duration-fast) var(--ease-in);
 }
 
 .sidebarIconDisabled {
@@ -128,11 +159,17 @@
 }
 
 .chatEmptyStateTitle {
-    font-size: 2rem;
-    font-weight: 400;
-    margin: 2rem 0 1rem 0;
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin: var(--space-3xl) 0 var(--space-xl) 0;
     color: var(--text-primary);
-    line-height: 1.3;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp var(--duration-slow) var(--ease-out);
 }
 
 .chatEmptyStateSubtitle {
@@ -166,11 +203,12 @@
 
 .chatInput {
     position: fixed;
-    bottom: 2rem;
+    bottom: var(--space-2xl);
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
     max-width: 680px;
+    animation: slideInRight var(--duration-slow) var(--ease-out) 0.5s both;
     padding: 0;
     background: transparent;
     z-index: 10;
@@ -202,28 +240,78 @@
 .suggestionButtons {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: var(--space-md);
     justify-content: center;
-    margin-top: 2rem;
+    margin-top: var(--space-2xl);
     margin-bottom: 8rem;
+    animation: fadeInUp var(--duration-slow) var(--ease-out) 0.2s both;
 }
 
 .suggestionButton {
     background: var(--bg-secondary);
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-full);
+    padding: var(--space-md) var(--space-xl);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--duration-normal) var(--ease-out);
     font-size: 0.875rem;
+    font-weight: 500;
     color: var(--text-secondary);
     white-space: nowrap;
+    box-shadow: var(--shadow-xs);
+    position: relative;
+    overflow: hidden;
+}
+
+.suggestionButton::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left var(--duration-slow) var(--ease-out);
+}
+
+.suggestionButton:hover::before {
+    left: 100%;
 }
 
 .suggestionButton:hover {
-    background: var(--bg-primary);
-    border-color: var(--border-medium);
-    color: var(--text-primary);
+    background: var(--accent-light);
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.suggestionButton:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Staggered animation delays */
+.animateDelay1 {
+    animation-delay: 0.1s;
+}
+.animateDelay2 {
+    animation-delay: 0.15s;
+}
+.animateDelay3 {
+    animation-delay: 0.2s;
+}
+.animateDelay4 {
+    animation-delay: 0.25s;
+}
+.animateDelay5 {
+    animation-delay: 0.3s;
+}
+.animateDelay6 {
+    animation-delay: 0.35s;
+}
+.animateDelay7 {
+    animation-delay: 0.4s;
 }
 
 @media (max-width: 768px) {
