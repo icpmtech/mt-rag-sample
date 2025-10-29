@@ -1,29 +1,60 @@
+.questionInputWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
 .questionInputContainer {
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        0 1px 4px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
     width: 100%;
-    padding: var(--space-lg) var(--space-xl);
-    background: var(--bg-secondary);
-    border: 2px solid var(--border-light);
+    padding: var(--space-lg);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     position: relative;
     transition: all var(--duration-normal) var(--ease-out);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    min-height: 56px;
+    align-items: center;
+    display: flex;
+}
+
+.inputIconContainer {
+    display: flex;
+    align-items: center;
+    padding-right: var(--space-md);
+    opacity: 0.6;
+    transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.inputIcon {
+    width: 20px;
+    height: 20px;
+    color: var(--accent-primary);
 }
 
 .questionInputTextArea {
-    width: 100%;
-    line-height: 1.5rem;
+    flex: 1;
+    line-height: 1.6;
     border: none;
     outline: none;
     background: transparent;
     font-size: 1rem;
     color: var(--text-primary);
     resize: none;
+    padding: var(--space-sm) 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-weight: 400;
 }
 
 .questionInputTextArea::placeholder {
     color: var(--text-muted);
+    font-weight: 400;
 }
 
 .questionInputButtonsContainer {
@@ -31,56 +62,260 @@
     flex-direction: row;
     align-items: center;
     gap: var(--space-sm);
-    position: absolute;
-    right: var(--space-lg);
-    top: 50%;
-    transform: translateY(-50%);
+    padding-left: var(--space-md);
 }
 
 .sendButton {
-    background: var(--accent-primary) !important;
+    background: var(--border-light) !important;
     border: none !important;
     border-radius: var(--radius-full) !important;
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    min-height: 32px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
     padding: 0 !important;
     transition: all var(--duration-normal) var(--ease-out) !important;
-    box-shadow: var(--shadow-sm) !important;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+    position: relative;
+    overflow: hidden;
 }
 
-.sendButton:hover {
-    background: var(--accent-hover) !important;
-    transform: scale(1.05) !important;
-    box-shadow: var(--shadow-md) !important;
+.sendButton::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
 }
 
-.sendButton:active {
-    transform: scale(0.95) !important;
+.sendButton:hover::before {
+    opacity: 1;
+}
+
+.sendButtonActive {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, #1557b0 100%) !important;
+    box-shadow:
+        0 4px 12px rgba(26, 115, 232, 0.25),
+        0 2px 4px rgba(26, 115, 232, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.sendButtonActive:hover {
+    background: linear-gradient(135deg, var(--accent-hover) 0%, #0f4c99 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow:
+        0 6px 16px rgba(26, 115, 232, 0.3),
+        0 3px 6px rgba(26, 115, 232, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.sendButton:active,
+.sendButtonActive:active {
+    transform: translateY(0) scale(0.98) !important;
 }
 
 .sendButton:disabled {
-    background: var(--border-medium) !important;
+    background: var(--border-light) !important;
     transform: none !important;
-    box-shadow: none !important;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+.speechButton {
+    background: rgba(115, 118, 225, 0.1) !important;
+    border: 1px solid rgba(115, 118, 225, 0.2) !important;
+    border-radius: var(--radius-full) !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    padding: 0 !important;
+    transition: all var(--duration-normal) var(--ease-out) !important;
+    box-shadow:
+        0 1px 3px rgba(115, 118, 225, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+.speechButton:hover {
+    background: rgba(115, 118, 225, 0.15) !important;
+    border-color: rgba(115, 118, 225, 0.3) !important;
+    transform: translateY(-1px) !important;
+    box-shadow:
+        0 4px 8px rgba(115, 118, 225, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+.speechButtonRecording {
+    background: rgba(250, 0, 0, 0.1) !important;
+    border-color: rgba(250, 0, 0, 0.3) !important;
+    animation: pulse 1.5s infinite !important;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 0 0 rgba(250, 0, 0, 0.4),
+            0 1px 3px rgba(250, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    50% {
+        box-shadow:
+            0 0 0 8px rgba(250, 0, 0, 0),
+            0 1px 3px rgba(250, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
 }
 
 .questionInputContainer:focus-within {
-    border-color: var(--accent-primary);
+    border-color: rgba(26, 115, 232, 0.4);
     box-shadow:
-        var(--shadow-xl),
-        0 0 0 4px var(--accent-light);
-    transform: translateY(-2px);
+        0 4px 16px rgba(26, 115, 232, 0.12),
+        0 2px 8px rgba(26, 115, 232, 0.08),
+        0 0 0 3px rgba(26, 115, 232, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+}
+
+.questionInputContainer:focus-within .inputIconContainer {
+    opacity: 1;
+}
+
+.inputHint {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 var(--space-sm);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.questionInputContainer:focus-within + .inputHint,
+.inputHint:has(.characterCount) {
+    opacity: 1;
+}
+
+.characterCount {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.keyboardHint {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Modern Tooltip Styles */
+.modernTooltip {
+    padding: var(--space-md);
+    max-width: 280px;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: var(--radius-lg);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tooltipTitle {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: white;
+    margin-bottom: var(--space-xs);
+    line-height: 1.3;
+}
+
+.tooltipDescription {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.4;
 }
 
 @media (min-width: 992px) {
     .questionInputContainer {
-        min-height: 3.5rem;
+        min-height: 56px;
+        padding: var(--space-lg) var(--space-xl);
     }
 
     .questionInputTextArea {
-        font-size: 1.1rem;
-        padding-right: 4rem;
+        font-size: 1rem;
+    }
+
+    .sendButton,
+    .speechButton {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .questionInputContainer {
+        padding: var(--space-md);
+        min-height: 48px;
+    }
+
+    .questionInputTextArea {
+        font-size: 0.95rem;
+    }
+
+    .sendButton,
+    .speechButton {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+    }
+
+    .inputHint {
+        font-size: 0.7rem;
+        padding: 0 var(--space-xs);
+    }
+}
+
+/* Dark mode adaptations */
+@media (prefers-color-scheme: dark) {
+    .questionInputContainer {
+        background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(16, 16, 16, 0.95) 100%);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow:
+            0 2px 8px rgba(0, 0, 0, 0.3),
+            0 1px 4px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .questionInputContainer:focus-within {
+        border-color: rgba(66, 133, 244, 0.4);
+        box-shadow:
+            0 4px 16px rgba(66, 133, 244, 0.2),
+            0 2px 8px rgba(66, 133, 244, 0.1),
+            0 0 0 3px rgba(66, 133, 244, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .modernTooltip {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .tooltipTitle {
+        color: var(--text-primary);
+    }
+
+    .tooltipDescription {
+        color: var(--text-secondary);
     }
 }

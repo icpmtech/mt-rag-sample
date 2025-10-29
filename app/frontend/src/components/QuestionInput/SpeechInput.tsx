@@ -99,18 +99,47 @@ export const SpeechInput = ({ updateQuestion }: Props) => {
     return (
         <>
             {!isRecording && (
-                <div className={styles.questionInputButtonsContainer}>
-                    <Tooltip content={t("tooltips.askWithVoice")} relationship="label">
-                        <Button size="large" icon={<Mic28Filled primaryFill="rgba(115, 118, 225, 1)" />} onClick={startRecording} />
-                    </Tooltip>
-                </div>
+                <Tooltip
+                    content={
+                        <div className={styles.modernTooltip}>
+                            <div className={styles.tooltipTitle}>{t("tooltips.askWithVoice")}</div>
+                            <div className={styles.tooltipDescription}>{t("tooltips.askWithVoiceDescription")}</div>
+                        </div>
+                    }
+                    relationship="label"
+                    positioning="above"
+                    appearance="inverted"
+                >
+                    <Button
+                        size="large"
+                        icon={<Mic28Filled primaryFill="rgba(115, 118, 225, 1)" />}
+                        onClick={startRecording}
+                        className={styles.speechButton}
+                        aria-label={t("tooltips.askWithVoice")}
+                    />
+                </Tooltip>
             )}
             {isRecording && (
-                <div className={styles.questionInputButtonsContainer}>
-                    <Tooltip content={t("tooltips.stopRecording")} relationship="label">
-                        <Button size="large" icon={<Mic28Filled primaryFill="rgba(250, 0, 0, 0.7)" />} disabled={!isRecording} onClick={stopRecording} />
-                    </Tooltip>
-                </div>
+                <Tooltip
+                    content={
+                        <div className={styles.modernTooltip}>
+                            <div className={styles.tooltipTitle}>{t("tooltips.stopRecording")}</div>
+                            <div className={styles.tooltipDescription}>{t("tooltips.stopRecordingDescription")}</div>
+                        </div>
+                    }
+                    relationship="label"
+                    positioning="above"
+                    appearance="inverted"
+                >
+                    <Button
+                        size="large"
+                        icon={<Mic28Filled primaryFill="rgba(250, 0, 0, 0.7)" />}
+                        disabled={!isRecording}
+                        onClick={stopRecording}
+                        className={`${styles.speechButton} ${styles.speechButtonRecording}`}
+                        aria-label={t("tooltips.stopRecording")}
+                    />
+                </Tooltip>
             )}
         </>
     );

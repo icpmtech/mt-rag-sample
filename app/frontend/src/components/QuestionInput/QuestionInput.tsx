@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { Stack, TextField } from "@fluentui/react";
 import { Button, Tooltip } from "@fluentui/react-components";
-import { Send28Filled } from "@fluentui/react-icons";
+import { Send28Filled, ChatSparkle28Regular } from "@fluentui/react-icons";
 import { useTranslation } from "react-i18next";
 
 import styles from "./QuestionInput.module.css";
@@ -72,32 +72,59 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, init
     }
 
     return (
-        <Stack horizontal className={styles.questionInputContainer}>
-            <TextField
-                className={styles.questionInputTextArea}
-                disabled={disableRequiredAccessControl}
-                placeholder={placeholder}
-                multiline
-                resizable={false}
-                borderless
-                value={question}
-                onChange={onQuestionChange}
-                onKeyDown={onEnterPress}
-                onCompositionStart={handleCompositionStart}
-                onCompositionEnd={handleCompositionEnd}
-            />
-            <div className={styles.questionInputButtonsContainer}>
-                {showSpeechInput && <SpeechInput updateQuestion={setQuestion} />}
-                <Tooltip content={t("tooltips.submitQuestion")} relationship="label">
-                    <Button
-                        size="large"
-                        icon={<Send28Filled primaryFill={sendQuestionDisabled ? "rgba(158, 158, 158, 1)" : "rgba(25, 118, 210, 1)"} />}
-                        disabled={sendQuestionDisabled}
-                        onClick={sendQuestion}
-                        className={styles.sendButton}
-                    />
-                </Tooltip>
+        <div className={styles.questionInputWrapper}>
+            <Stack horizontal className={styles.questionInputContainer}>
+                <div className={styles.inputIconContainer}>
+                    <ChatSparkle28Regular className={styles.inputIcon} />
+                </div>
+                <TextField
+                    className={styles.questionInputTextArea}
+                    disabled={disableRequiredAccessControl}
+                    placeholder={placeholder}
+                    multiline
+                    resizable={false}
+                    borderless
+                    value={question}
+                    onChange={onQuestionChange}
+                    onKeyDown={onEnterPress}
+                    onCompositionStart={handleCompositionStart}
+                    onCompositionEnd={handleCompositionEnd}
+                    aria-label={t("tooltips.questionInputAriaLabel")}
+                />
+                <div className={styles.questionInputButtonsContainer}>
+                    {showSpeechInput && <SpeechInput updateQuestion={setQuestion} />}
+                    <Tooltip
+                        content={
+                            <div className={styles.modernTooltip}>
+                                <div className={styles.tooltipTitle}>{t("tooltips.submitQuestion")}</div>
+                                <div className={styles.tooltipDescription}>
+                                    {sendQuestionDisabled ? t("tooltips.submitQuestionDisabled") : t("tooltips.submitQuestionDescription")}
+                                </div>
+                            </div>
+                        }
+                        relationship="label"
+                        positioning="above"
+                        appearance="inverted"
+                    >
+                        <Button
+                            size="large"
+                            icon={<Send28Filled primaryFill={sendQuestionDisabled ? "rgba(158, 158, 158, 1)" : "rgba(25, 118, 210, 1)"} />}
+                            disabled={sendQuestionDisabled}
+                            onClick={sendQuestion}
+                            className={`${styles.sendButton} ${!sendQuestionDisabled ? styles.sendButtonActive : ""}`}
+                            aria-label={t("tooltips.submitQuestion")}
+                        />
+                    </Tooltip>
+                </div>
+            </Stack>
+            <div className={styles.inputHint}>
+                {question.length > 0 && (
+                    <span className={styles.characterCount}>
+                        {question.length}/1000 {t("tooltips.charactersUsed")}
+                    </span>
+                )}
+                <span className={styles.keyboardHint}>{t("tooltips.keyboardHint")}</span>
             </div>
-        </Stack>
+        </div>
     );
 };
