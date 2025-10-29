@@ -2,8 +2,10 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
     background: var(--bg-primary);
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .chatRoot {
@@ -28,6 +30,8 @@
     height: 100%;
     position: relative;
     padding: 1rem 1.5rem 2rem;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .chatEmptyState {
@@ -83,6 +87,7 @@
     flex-grow: 1;
     width: 100%;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 1rem 0;
     display: flex;
     flex-direction: column;
@@ -104,9 +109,9 @@
 .chatInput {
     position: fixed;
     bottom: var(--space-2xl);
-    left: 50%;
+    left: calc(64px + 50%);
     transform: translateX(-50%);
-    width: 90%;
+    width: calc(90% - 64px);
     max-width: 680px;
     animation: slideInRight var(--duration-slow) var(--ease-out) 0.5s both;
     padding: 0;
@@ -220,8 +225,8 @@
 
 @media (max-width: 768px) {
     .chatInput {
-        width: calc(100% - 1rem);
-        left: 0.5rem;
+        width: calc(100% - 56px - 1rem);
+        left: calc(56px + 0.5rem);
         transform: none;
     }
 

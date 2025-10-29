@@ -16,6 +16,7 @@
     flex-direction: column;
     height: 100vh;
     width: 100vw;
+    overflow: hidden;
 }
 
 .topHeader {
@@ -66,6 +67,8 @@
     display: flex;
     flex: 1;
     min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .main {
@@ -73,6 +76,8 @@
     flex: 1;
     min-height: 0; /* allow inner scroll areas to work inside flex container */
     background: var(--bg-primary);
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* Legacy header styles - hidden since we're using sidebar now */
@@ -127,6 +132,8 @@
 /* Sidebar Styles - Modern KnowMe Style */
 .sidebar {
     width: 64px;
+    min-width: 64px;
+    max-width: 64px;
     background: var(--bg-sidebar);
     border-right: 1px solid var(--border-light);
     display: flex;
@@ -136,6 +143,8 @@
     position: relative;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    overflow: hidden;
 }
 
 .sidebar:hover {
@@ -279,6 +288,8 @@
 @media (max-width: 768px) {
     .sidebar {
         width: 56px;
+        min-width: 56px;
+        max-width: 56px;
         padding: 0.5rem 0.25rem;
     }
 
