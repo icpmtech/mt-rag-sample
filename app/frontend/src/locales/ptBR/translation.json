@@ -1,5 +1,5 @@
 {
-    "pageTitle": "Assistente Mota Engil",
+    "pageTitle": "KnowMe - Assistente Mota Engil",
     "headerTitle": "Assistente Mota Engil",
     "chat": "Chat",
     "qa": "Faça uma pergunta",
@@ -46,7 +46,7 @@
         "5": "Faça uma aventura",
         "6": "Cria um meme",
         "7": "Joga trívia",
-        "placeholder": "Enviar Mensagem ao Copilot..."
+        "placeholder": "Enviar Mensagem ao KnowMe..."
     },
     "askTitle": "Pergunte aos seus dados",
     "multimodalExamples": {

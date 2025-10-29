@@ -419,8 +419,14 @@ const Chat = () => {
                 <div className={styles.chatContainer}>
                     {!lastQuestionRef.current ? (
                         <div className={styles.chatEmptyState}>
-                            <h1 className={styles.chatEmptyStateTitle}>{t("chatEmptyStateTitle")}</h1>
-                            <h2 className={styles.chatEmptyStateSubtitle}>{t("chatEmptyStateSubtitle")}</h2>
+                            <div className={styles.knowmeLogo}>
+                                <i className={`ms-Icon ms-Icon--Robot ${styles.knowmeIcon}`} />
+                            </div>
+                            <h1 className={styles.chatEmptyStateTitle}>Hello, I'm KnowMe</h1>
+                            <p className={styles.chatEmptyStateDescription}>
+                                I can help you find information, answer questions, and assist with various tasks. Try asking me something below or click on one
+                                of the suggestions.
+                            </p>
                             {showLanguagePicker && <LanguagePicker onLanguageChange={newLang => i18n.changeLanguage(newLang)} />}
 
                             <div className={styles.suggestionButtons}>

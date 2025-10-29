@@ -64,38 +64,44 @@ export const Answer = ({
     return (
         <Stack className={`${styles.answerContainer} ${isSelected && styles.selected}`} verticalAlign="space-between">
             <Stack.Item>
-                <Stack horizontal horizontalAlign="space-between">
-                    <AnswerIcon />
-                    <div>
-                        <IconButton
-                            style={{ color: "black" }}
-                            iconProps={{ iconName: copied ? "CheckMark" : "Copy" }}
+                <div className={styles.answerHeader}>
+                    <div className={styles.avatarContainer}>
+                        <AnswerIcon />
+                    </div>
+                    <h4 className={styles.assistantLabel}>KnowMe</h4>
+                    <div className={styles.actionButtons}>
+                        <button
+                            className={styles.actionButton}
                             title={copied ? t("tooltips.copied") : t("tooltips.copy")}
-                            ariaLabel={copied ? t("tooltips.copied") : t("tooltips.copy")}
+                            aria-label={copied ? t("tooltips.copied") : t("tooltips.copy")}
                             onClick={handleCopy}
-                        />
-                        <IconButton
-                            style={{ color: "black" }}
-                            iconProps={{ iconName: "Lightbulb" }}
+                        >
+                            <i className={`ms-Icon ms-Icon--${copied ? "CheckMark" : "Copy"}`} />
+                        </button>
+                        <button
+                            className={styles.actionButton}
                             title={t("tooltips.showThoughtProcess")}
-                            ariaLabel={t("tooltips.showThoughtProcess")}
+                            aria-label={t("tooltips.showThoughtProcess")}
                             onClick={() => onThoughtProcessClicked()}
                             disabled={!answer.context.thoughts?.length || isStreaming}
-                        />
-                        <IconButton
-                            style={{ color: "black" }}
-                            iconProps={{ iconName: "ClipboardList" }}
+                        >
+                            <i className="ms-Icon ms-Icon--Lightbulb" />
+                        </button>
+                        <button
+                            className={styles.actionButton}
                             title={t("tooltips.showSupportingContent")}
-                            ariaLabel={t("tooltips.showSupportingContent")}
+                            aria-label={t("tooltips.showSupportingContent")}
                             onClick={() => onSupportingContentClicked()}
                             disabled={!answer.context.data_points || isStreaming}
-                        />
+                        >
+                            <i className="ms-Icon ms-Icon--ClipboardList" />
+                        </button>
                         {showSpeechOutputAzure && (
                             <SpeechOutputAzure answer={sanitizedAnswerHtml} index={index} speechConfig={speechConfig} isStreaming={isStreaming} />
                         )}
                         {showSpeechOutputBrowser && <SpeechOutputBrowser answer={sanitizedAnswerHtml} />}
                     </div>
-                </Stack>
+                </div>
             </Stack.Item>
 
             <Stack.Item grow>

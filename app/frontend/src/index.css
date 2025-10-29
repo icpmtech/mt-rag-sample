@@ -8,24 +8,24 @@
     --mota-engil-white: #ffffff;
     --mota-engil-accent: #0088cc;
 
-    /* Modern UI Colors */
-    --bg-primary: #fafafa;
+    /* Modern UI Colors - KnowMe Inspired */
+    --bg-primary: #f3f2f1;
     --bg-secondary: #ffffff;
-    --bg-sidebar: #f8f9fa;
-    --bg-sidebar-gradient: linear-gradient(180deg, #f8f9fa 0%, #f1f3f4 100%);
-    --text-primary: #1a1a1a;
-    --text-secondary: #5f6368;
-    --text-muted: #9aa0a6;
-    --text-light: #80868b;
-    --border-light: #e8eaed;
-    --border-medium: #dadce0;
-    --border-hover: #c4c7c9;
-    --accent-primary: #1a73e8;
-    --accent-hover: #1557b0;
-    --accent-light: #e8f0fe;
-    --success: #137333;
-    --warning: #f9ab00;
-    --error: #d93025;
+    --bg-sidebar: #faf9f8;
+    --bg-sidebar-gradient: linear-gradient(180deg, #faf9f8 0%, #f3f2f1 100%);
+    --text-primary: #323130;
+    --text-secondary: #605e5c;
+    --text-muted: #8a8886;
+    --text-light: #a19f9d;
+    --border-light: #edebe9;
+    --border-medium: #d2d0ce;
+    --border-hover: #c8c6c4;
+    --accent-primary: #0078d4;
+    --accent-hover: #106ebe;
+    --accent-light: #deecf9;
+    --success: #107c10;
+    --warning: #ffc83d;
+    --error: #d13438;
 
     /* Enhanced Shadows */
     --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
