@@ -70,32 +70,29 @@ export const Answer = ({
                     </div>
                     <h4 className={styles.assistantLabel}>KnowMe</h4>
                     <div className={styles.actionButtons}>
-                        <button
+                        <IconButton
                             className={styles.actionButton}
+                            iconProps={{ iconName: copied ? "CheckMark" : "Copy" }}
                             title={copied ? t("tooltips.copied") : t("tooltips.copy")}
-                            aria-label={copied ? t("tooltips.copied") : t("tooltips.copy")}
+                            ariaLabel={copied ? t("tooltips.copied") : t("tooltips.copy")}
                             onClick={handleCopy}
-                        >
-                            <i className={`ms-Icon ms-Icon--${copied ? "CheckMark" : "Copy"}`} />
-                        </button>
-                        <button
+                        />
+                        <IconButton
                             className={styles.actionButton}
+                            iconProps={{ iconName: "Lightbulb" }}
                             title={t("tooltips.showThoughtProcess")}
-                            aria-label={t("tooltips.showThoughtProcess")}
+                            ariaLabel={t("tooltips.showThoughtProcess")}
                             onClick={() => onThoughtProcessClicked()}
                             disabled={!answer.context.thoughts?.length || isStreaming}
-                        >
-                            <i className="ms-Icon ms-Icon--Lightbulb" />
-                        </button>
-                        <button
+                        />
+                        <IconButton
                             className={styles.actionButton}
+                            iconProps={{ iconName: "ClipboardList" }}
                             title={t("tooltips.showSupportingContent")}
-                            aria-label={t("tooltips.showSupportingContent")}
+                            ariaLabel={t("tooltips.showSupportingContent")}
                             onClick={() => onSupportingContentClicked()}
                             disabled={!answer.context.data_points || isStreaming}
-                        >
-                            <i className="ms-Icon ms-Icon--ClipboardList" />
-                        </button>
+                        />
                         {showSpeechOutputAzure && (
                             <SpeechOutputAzure answer={sanitizedAnswerHtml} index={index} speechConfig={speechConfig} isStreaming={isStreaming} />
                         )}

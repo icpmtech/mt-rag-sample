@@ -173,23 +173,42 @@ sup {
     margin-left: auto;
 }
 
+.actionButtons:hover .actionButton {
+    opacity: 0.7;
+}
+
+.actionButtons .actionButton:hover {
+    opacity: 1;
+}
+
 .actionButton {
     width: 32px;
     height: 32px;
-    border: none;
-    background: transparent;
+    border: 1px solid var(--border-light, #e1dfdd);
+    background: var(--background-secondary, #f3f2f1);
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all var(--duration-fast) var(--ease-out);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-secondary);
+    color: var(--text-primary, #323130);
+}
+
+.actionButton i {
+    color: var(--text-primary, #323130);
+    font-size: 0.875rem;
+    display: inline-block;
 }
 
 .actionButton:hover {
-    background: var(--border-light);
-    color: var(--text-primary);
+    background: var(--primary-color, #0078d4);
+    color: white;
+    border-color: var(--primary-color, #0078d4);
+}
+
+.actionButton:hover i {
+    color: white;
 }
 
 .actionButton:disabled {
@@ -200,6 +219,33 @@ sup {
 .actionButton:disabled:hover {
     background: transparent;
     color: var(--text-secondary);
+}
+
+.actionButton:disabled i {
+    color: var(--text-muted);
+}
+
+/* Ensure MS Icons are always visible */
+.actionButton .ms-Icon {
+    color: var(--text-primary, #323130) !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+    font-family: "FabricMDL2Icons" !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    text-decoration: none !important;
+    text-transform: none !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+.actionButton:hover .ms-Icon {
+    color: white !important;
+}
+
+.actionButton:disabled .ms-Icon {
+    color: var(--text-muted, #8a8886) !important;
 }
 
 @keyframes loading {
