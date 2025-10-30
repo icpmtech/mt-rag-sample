@@ -44,6 +44,7 @@ class Document:
     category: Optional[str] = None
     sourcepage: Optional[str] = None
     sourcefile: Optional[str] = None
+    storageUrl: Optional[str] = None
     oids: Optional[list[str]] = None
     groups: Optional[list[str]] = None
     captions: Optional[list[QueryCaptionResult]] = None
@@ -59,6 +60,7 @@ class Document:
             "category": self.category,
             "sourcepage": self.sourcepage,
             "sourcefile": self.sourcefile,
+            "storageUrl": self.storageUrl,
             "oids": self.oids,
             "groups": self.groups,
             "captions": (
@@ -97,6 +99,7 @@ class DataPoints:
     text: Optional[list[str]] = None
     images: Optional[list] = None
     citations: Optional[list[str]] = None
+    citation_lookup: Optional[dict[str, str]] = None  # Maps citation names to their storage URLs
 
 
 @dataclass
@@ -246,6 +249,7 @@ class Approach(ABC):
                         category=document.get("category"),
                         sourcepage=document.get("sourcepage"),
                         sourcefile=document.get("sourcefile"),
+                        storageUrl=document.get("storageUrl"),
                         oids=document.get("oids"),
                         groups=document.get("groups"),
                         captions=cast(list[QueryCaptionResult], document.get("@search.captions")),
@@ -381,12 +385,21 @@ class Approach(ABC):
         text_sources = []
         image_sources = []
         seen_urls = set()
+        citation_lookup = {}  # Maps citation names to their storage URLs
 
         for doc in results:
             # Get the citation for the source page
             citation = self.get_citation(doc.sourcepage)
             if citation not in citations:
                 citations.append(citation)
+                # Add to citation lookup if storageUrl is available
+                if doc.storageUrl:
+                    # Extract page information from citation if it exists
+                    if "#page=" in citation and "sharepoint.com" in doc.storageUrl:
+                        # For SharePoint, we can't use #page= fragment, but we preserve the citation as is
+                        citation_lookup[citation] = doc.storageUrl
+                    else:
+                        citation_lookup[citation] = doc.storageUrl
 
             # If semantic captions are used, extract captions; otherwise, use content
             if include_text_sources:
@@ -406,7 +419,7 @@ class Approach(ABC):
                     if url:
                         image_sources.append(url)
                     citations.append(self.get_image_citation(doc.sourcepage or "", img["url"]))
-        return DataPoints(text=text_sources, images=image_sources, citations=citations)
+        return DataPoints(text=text_sources, images=image_sources, citations=citations, citation_lookup=citation_lookup)
 
     def get_citation(self, sourcepage: Optional[str]):
         return sourcepage or ""

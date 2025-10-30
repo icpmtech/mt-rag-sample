@@ -8,6 +8,7 @@
   "settings": {
     "terminal.integrated.env.windows": {
       "PATH": "C:\\Users\\pedro.mourao.martins.CLARANET\\.azurelogicapps\\dependencies\\DotNetSDK;${env:PATH}"
-    }
+    },
+    "debug.internalConsoleOptions": "neverOpen"
   }
 }

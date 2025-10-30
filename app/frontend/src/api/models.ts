@@ -51,6 +51,7 @@ export type DataPoints = {
     text: string[];
     images: string[];
     citations: string[];
+    citation_lookup?: { [key: string]: string };
 };
 
 export type ResponseContext = {

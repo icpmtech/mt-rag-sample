@@ -8,6 +8,7 @@ type HtmlParsedAnswer = {
 
 export function parseAnswerToHtml(answer: ChatAppResponse, isStreaming: boolean, onCitationClicked: (citationFilePath: string) => void): HtmlParsedAnswer {
     const possibleCitations = answer.context.data_points.citations || [];
+    const citationLookup = answer.context.data_points.citation_lookup || {};
     const citations: string[] = [];
 
     // Trim any whitespace from the end of the answer after removing follow-up questions
@@ -51,7 +52,7 @@ export function parseAnswerToHtml(answer: ChatAppResponse, isStreaming: boolean,
                 citationIndex = citations.length;
             }
 
-            const path = getCitationFilePath(part);
+            const path = getCitationFilePath(part, citationLookup);
 
             return renderToStaticMarkup(
                 <a className="supContainer" title={part} onClick={() => onCitationClicked(path)}>

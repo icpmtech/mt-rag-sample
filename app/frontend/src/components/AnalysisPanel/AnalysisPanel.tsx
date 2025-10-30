@@ -35,6 +35,13 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
     const fetchCitation = async () => {
         const token = client ? await getToken(client) : undefined;
         if (activeCitation) {
+            // Check if this is a SharePoint URL
+            if (activeCitation.includes("sharepoint.com")) {
+                // For SharePoint URLs, open directly in new tab instead of trying to embed
+                window.open(activeCitation, "_blank");
+                return;
+            }
+
             // Get hash from the URL as it may contain #page=N
             // which helps browser PDF renderer jump to correct page N
             const originalHash = activeCitation.indexOf("#") ? activeCitation.split("#")[1] : "";
@@ -58,6 +65,20 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
     const renderFileViewer = () => {
         if (!activeCitation) {
             return null;
+        }
+
+        // Check if this is a SharePoint URL
+        if (activeCitation.includes("sharepoint.com")) {
+            return (
+                <div className={styles.citationContainer}>
+                    <div className={styles.citationMessage}>
+                        <p>{t("sharePointDocumentOpened")}</p>
+                        <button onClick={() => window.open(activeCitation, "_blank")} className={styles.openSharePointButton}>
+                            {t("openInSharePoint")}
+                        </button>
+                    </div>
+                </div>
+            );
         }
 
         const fileExtension = activeCitation.split(".").pop()?.toLowerCase();

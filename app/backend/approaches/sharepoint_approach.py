@@ -324,10 +324,17 @@ class SharePointRetrieveThenReadApproach(Approach):
         
         from approaches.approach import DataPoints
         
+        # Build citation lookup for SharePoint URLs
+        citation_lookup = {}
+        for citation in citations:
+            if citation.get("title") and citation.get("url"):
+                citation_lookup[citation["title"]] = citation["url"]
+        
         return DataPoints(
             text=sources_content,
             images=[],
             citations=citations,
+            citation_lookup=citation_lookup
         )
 
     def extract_sharepoint_metadata(self, sources: list[str]) -> dict[str, Any]:

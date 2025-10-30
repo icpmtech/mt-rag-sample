@@ -187,5 +187,8 @@
 
     "overallSettings": "Configurações gerais",
     "searchSettings": "Configurações de pesquisa",
-    "llmSettings": "Configurações LLM"
+    "llmSettings": "Configurações LLM",
+    "sharePointDocumentOpened": "Este documento está hospedado no SharePoint e será aberto em uma nova aba.",
+    "openInSharePoint": "Abrir no SharePoint",
+    "page": "página"
 }

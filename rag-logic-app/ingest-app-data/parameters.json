@@ -1,0 +1,45 @@
+{
+  "AISearchIndexName_template": {
+    "value": "multimodal-index"
+  },
+  "OpenAIModel_template": {
+    "value": "text-embedding-3-large"
+  },
+  "SharepointSiteAddress_template": {
+    "value": "https://claranetapplications.sharepoint.com/sites/IT"
+  },
+  "SharepointLibraryName_template": {
+    "value": "LIST"
+  },
+  "$connections": {
+    "value": {
+      "azureaisearch_template": {
+        "id": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/providers/Microsoft.Web/locations/eastus/managedApis/azureaisearch",
+        "connectionId": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/resourceGroups/rg-mt-rag-azure/providers/Microsoft.Web/connections/aisearchbymi-gptkb-dmauu4o3w36h6-forwizard",
+        "connectionProperties": {
+          "authentication": {
+            "type": "ManagedServiceIdentity"
+          }
+        }
+      },
+      "azureopenai_template": {
+        "id": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/providers/Microsoft.Web/locations/eastus/managedApis/azureopenai",
+        "connectionId": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/resourceGroups/rg-mt-rag-azure/providers/Microsoft.Web/connections/aoaibymi-cog-dmauu4o3w36h6-forwizard",
+        "connectionProperties": {
+          "authentication": {
+            "type": "ManagedServiceIdentity"
+          }
+        }
+      },
+      "sharepointonline_template": {
+        "id": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/providers/Microsoft.Web/locations/eastus/managedApis/sharepointonline",
+        "connectionId": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/resourceGroups/rg-mt-rag-azure/providers/Microsoft.Web/connections/sharepointonline",
+        "connectionProperties": {
+          "authentication": {
+            "type": "ManagedServiceIdentity"
+          }
+        }
+      }
+    }
+  }
+}

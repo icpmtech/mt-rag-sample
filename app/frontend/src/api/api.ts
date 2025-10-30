@@ -90,12 +90,23 @@ export async function getSpeechApi(text: string): Promise<string | null> {
         .then(blob => (blob ? URL.createObjectURL(blob) : null));
 }
 
-export function getCitationFilePath(citation: string): string {
+export function getCitationFilePath(citation: string, citationLookup?: { [key: string]: string }): string {
     // If there are parentheses at end of citation, remove part in parentheses
     const cleanedCitation = citation.replace(/\s*\(.*?\)\s*$/, "").trim();
+
+    // Check if we have a direct SharePoint URL for this citation (try exact match first)
+    if (citationLookup && citationLookup[citation]) {
+        return citationLookup[citation];
+    }
+
+    // Try without page number if no exact match
+    if (citationLookup && citationLookup[cleanedCitation]) {
+        return citationLookup[cleanedCitation];
+    }
+
+    // For blob storage, preserve page fragment in URL
     return `${BACKEND_URI}/content/${cleanedCitation}`;
 }
-
 export async function uploadFileApi(request: FormData, idToken: string): Promise<SimpleAPIResponse> {
     const response = await fetch("/upload", {
         method: "POST",

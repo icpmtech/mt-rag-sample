@@ -181,5 +181,8 @@
 
     "overallSettings": "Overall settings",
     "searchSettings": "Search settings",
-    "llmSettings": "LLM settings"
+    "llmSettings": "LLM settings",
+    "sharePointDocumentOpened": "This document is hosted on SharePoint and will open in a new tab.",
+    "openInSharePoint": "Open in SharePoint",
+    "page": "page"
 }

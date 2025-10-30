@@ -1,200 +1,244 @@
 {
-  "definition": {
-    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-    "contentVersion": "1.0.0.0",
-    "triggers": {
-      "When_a_HTTP_request_is_received": {
-        "type": "Request",
-        "kind": "Http"
-      }
-    },
-    "actions": {
-      "Get_files_properties_for_all_items_in_the_library": {
-        "type": "ApiConnection",
-        "inputs": {
-          "host": {
-            "connection": {
-              "name": "@parameters('$connections')['sharepointonline_template']['connectionId']"
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "When_a_HTTP_request_is_received": {
+                "type": "Request",
+                "kind": "Http"
             }
-          },
-          "method": "get",
-          "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharepointSiteAddress_template')))}/tables/@{encodeURIComponent(encodeURIComponent(parameters('SharepointLibraryName_template')))}/getfileitems"
         },
-        "runAfter": {}
-      },
-      "For_each_item_in_the_library": {
-        "type": "Foreach",
-        "foreach": "@body('Get_files_properties_for_all_items_in_the_library')?['value']",
         "actions": {
-          "If_this_is_a_File": {
-            "type": "If",
-            "expression": {
-              "and": [
-                {
-                  "equals": [
-                    "@items('For_each_item_in_the_library')['{IsFolder}']",
-                    false
-                  ]
+            "Get_files_properties_for_all_items_in_the_library": {
+                "runAfter": {},
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['sharepointonline_template']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharepointSiteAddress_template')))}/tables/@{encodeURIComponent(encodeURIComponent(parameters('SharepointLibraryName_template')))}/getfileitems"
                 }
-              ]
             },
-            "actions": {
-              "Get_file_content": {
-                "type": "ApiConnection",
-                "inputs": {
-                  "host": {
-                    "connection": {
-                      "name": "@parameters('$connections')['sharepointonline_template']['connectionId']"
+            "For_each_item_in_the_library": {
+                "foreach": "@body('Get_files_properties_for_all_items_in_the_library')?['value']",
+                "actions": {
+                    "If_this_is_a_File": {
+                        "actions": {
+                            "Get_file_content": {
+                                "type": "ApiConnection",
+                                "inputs": {
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['sharepointonline_template']['connectionId']"
+                                        }
+                                    },
+                                    "method": "get",
+                                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharepointSiteAddress_template')))}/files/@{encodeURIComponent(item()?['{Identifier}'])}/content",
+                                    "queries": {
+                                        "inferContentType": true
+                                    }
+                                }
+                            },
+                            "Parse_a_document": {
+                                "runAfter": {
+                                    "Get_file_content": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ParseDocument",
+                                "inputs": {
+                                    "content": "@body('Get_file_content')"
+                                }
+                            },
+                            "Chunk_text": {
+                                "runAfter": {
+                                    "Parse_a_document": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ChunkText",
+                                "inputs": {
+                                    "chunkingStrategy": "TokenSize",
+                                    "text": "@body('Parse_a_document')?['text']",
+                                    "encodingModel": "cl100k_base",
+                                    "tokenSize": 5000,
+                                    "pageOverlapLength": 0
+                                }
+                            },
+                            "Azure_OpenAI_-_Get_multiple_embeddings": {
+                                "runAfter": {
+                                    "Chunk_text": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ApiConnection",
+                                "inputs": {
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['azureopenai_template']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "body": {
+                                        "input": "@body('Chunk_text')?['value']"
+                                    },
+                                    "path": "/deployments/@{encodeURIComponent(parameters('OpenAIModel_template'))}/multipleEmbeddings",
+                                    "queries": {
+                                        "api-version": "2023-05-15"
+                                    }
+                                }
+                            },
+                            "Select_embeddings_and_map_to_Index": {
+                                "runAfter": {
+                                    "Azure_OpenAI_-_Get_multiple_embeddings": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "Select",
+                                "inputs": {
+                                    "from": "@range(0, length(body('Chunk_text')['value']))",
+                                    "select": {
+                                        "content": "@{body('Chunk_text')['value'][item()]}",
+                                        "sourcepage": "@{concat(items('For_each_item_in_the_library')['{Name}'], '#page=', add(item(), 1))}",
+                                        "embedding3": "@body('Azure_OpenAI_-_Get_multiple_embeddings')['embeddings'][item()]",
+                                        "sourcefile": "@{items('For_each_item_in_the_library')['{FullPath}']}",
+                                        "storageUrl": "@{items('For_each_item_in_the_library')['{Link}']}",
+                                        "id": "@{concat(items('For_each_item_in_the_library')['{Name}'], '_chunk_', item())}",
+                                        "category": "document",
+                                        "oids": [],
+                                        "groups": []
+                                    }
+                                }
+                            },
+                            "Index_multiple_documents": {
+                                "runAfter": {
+                                    "Select_embeddings_and_map_to_Index": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ApiConnection",
+                                "inputs": {
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['azureaisearch_template']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "body": "@body('Select_embeddings_and_map_to_Index')",
+                                    "path": "/indexDocuments",
+                                    "queries": {
+                                        "indexName": "@parameters('AISearchIndexName_template')"
+                                    }
+                                }
+                            }
+                        },
+                        "else": {
+                            "actions": {
+                                "No_action_needed_for_Folder": {
+                                    "type": "Compose",
+                                    "inputs": "No action needed for Folder"
+                                }
+                            }
+                        },
+                        "expression": {
+                            "and": [
+                                {
+                                    "equals": [
+                                        "@items('For_each_item_in_the_library')['{IsFolder}']",
+                                        false
+                                    ]
+                                }
+                            ]
+                        },
+                        "type": "If"
                     }
-                  },
-                  "method": "get",
-                  "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharepointSiteAddress_template')))}/files/@{encodeURIComponent(item()?['{Identifier}'])}/content",
-                  "queries": {
-                    "inferContentType": true
-                  }
-                }
-              },
-              "Parse_a_document": {
-                "type": "ParseDocument",
-                "inputs": {
-                  "content": "@body('Get_file_content')"
                 },
                 "runAfter": {
-                  "Get_file_content": [
-                    "Succeeded"
-                  ]
-                }
-              },
-              "Chunk_text": {
-                "type": "ChunkText",
-                "inputs": {
-                  "chunkingStrategy": "TokenSize",
-                  "text": "@body('Parse_a_document')?['text']",
-                  "encodingModel": "cl100k_base",
-                  "tokenSize": 5000,
-                  "pageOverlapLength": 0
+                    "Get_files_properties_for_all_items_in_the_library": [
+                        "Succeeded"
+                    ]
                 },
-                "runAfter": {
-                  "Parse_a_document": [
-                    "Succeeded"
-                  ]
-                }
-              },
-              "Azure_OpenAI_-_Get_multiple_embeddings": {
-                "type": "ApiConnection",
-                "inputs": {
-                  "host": {
-                    "connection": {
-                      "name": "@parameters('$connections')['azureopenai_template']['connectionId']"
-                    }
-                  },
-                  "method": "post",
-                  "body": {
-                    "input": "@body('Chunk_text')?['value']"
-                  },
-                  "path": "/deployments/@{encodeURIComponent(parameters('OpenAIModel_template'))}/multipleEmbeddings",
-                  "queries": {
-                    "api-version": "2023-05-15"
-                  }
-                },
-                "runAfter": {
-                  "Chunk_text": [
-                    "Succeeded"
-                  ]
-                }
-              },
-              "Select_embeddings_and_map_to_Index": {
-                "type": "Select",
-                "inputs": {
-                  "from": "@range(0, length(body('Chunk_text')['value']))",
-                  "select": {
-                    "chunk": "@{body('Chunk_text')['value'][item()]}",
-                    "title": "@{items('For_each_item_in_the_library')['{Name}']}",
-                    "text_vector": "@body('Azure_OpenAI_-_Get_multiple_embeddings')['embeddings'][item()]",
-                    "parent_id": "@{items('For_each_item_in_the_library')['{FullPath}']}",
-                    "chunk_id": "@{replace(replace(replace(replace(concat(items('For_each_item_in_the_library')['{Name}'], '_', item()), ' ', '_'), '(', '_'), ')', '_'), '.', '_')}"
-                  }
-                },
-                "runAfter": {
-                  "Azure_OpenAI_-_Get_multiple_embeddings": [
-                    "Succeeded"
-                  ]
-                }
-              },
-              "Index_multiple_documents": {
-                "type": "ApiConnection",
-                "inputs": {
-                  "host": {
-                    "connection": {
-                      "name": "@parameters('$connections')['azureaisearch_template']['connectionId']"
-                    }
-                  },
-                  "method": "post",
-                  "body": "@body('Select_embeddings_and_map_to_Index')",
-                  "path": "/indexDocuments",
-                  "queries": {
-                    "indexName": "@parameters('AISearchIndexName_template')"
-                  }
-                },
-                "runAfter": {
-                  "Select_embeddings_and_map_to_Index": [
-                    "Succeeded"
-                  ]
-                }
-              }
-            },
-            "else": {
-              "actions": {
-                "No_action_needed_for_Folder": {
-                  "type": "Compose",
-                  "inputs": "No action needed for Folder"
-                }
-              }
+                "type": "Foreach"
             }
-          }
         },
-        "runAfter": {
-          "Get_files_properties_for_all_items_in_the_library": [
-            "Succeeded"
-          ]
+        "outputs": {},
+        "parameters": {
+            "AISearchIndexName": {
+                "defaultValue": "",
+                "type": "String"
+            },
+            "OpenAIModel": {
+                "defaultValue": "",
+                "type": "String"
+            },
+            "SharepointSiteAddress": {
+                "defaultValue": "",
+                "type": "String"
+            },
+            "SharepointLibraryName": {
+                "defaultValue": "",
+                "type": "String"
+            },
+            "AISearchIndexName_template": {
+                "type": "String"
+            },
+            "OpenAIModel_template": {
+                "type": "String"
+            },
+            "SharepointSiteAddress_template": {
+                "type": "String"
+            },
+            "SharepointLibraryName_template": {
+                "type": "String"
+            },
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
         }
-      }
     },
-    "outputs": {},
     "parameters": {
-      "AISearchIndexName": {
-        "defaultValue": "",
-        "type": "String"
-      },
-      "OpenAIModel": {
-        "defaultValue": "",
-        "type": "String"
-      },
-      "SharepointSiteAddress": {
-        "defaultValue": "",
-        "type": "String"
-      },
-      "SharepointLibraryName": {
-        "defaultValue": "",
-        "type": "String"
-      },
-      "AISearchIndexName_template": {
-        "type": "String"
-      },
-      "OpenAIModel_template": {
-        "type": "String"
-      },
-      "SharepointSiteAddress_template": {
-        "type": "String"
-      },
-      "SharepointLibraryName_template": {
-        "type": "String"
-      },
-      "$connections": {
-        "type": "Object",
-        "defaultValue": {}
-      }
+        "AISearchIndexName_template": {
+            "value": "multimodal-index"
+        },
+        "OpenAIModel_template": {
+            "value": "text-embedding-3-large"
+        },
+        "SharepointSiteAddress_template": {
+            "value": "https://claranetapplications.sharepoint.com/sites/IT"
+        },
+        "SharepointLibraryName_template": {
+            "value": "LIST"
+        },
+        "$connections": {
+            "type": "Object",
+            "value": {
+                "azureaisearch_template": {
+                    "id": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/providers/Microsoft.Web/locations/eastus/managedApis/azureaisearch",
+                    "connectionId": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/resourceGroups/rg-mt-rag-azure/providers/Microsoft.Web/connections/aisearchbymi-gptkb-dmauu4o3w36h6-forwizard",
+                    "connectionProperties": {
+                        "authentication": {
+                            "type": "ManagedServiceIdentity"
+                        }
+                    }
+                },
+                "azureopenai_template": {
+                    "id": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/providers/Microsoft.Web/locations/eastus/managedApis/azureopenai",
+                    "connectionId": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/resourceGroups/rg-mt-rag-azure/providers/Microsoft.Web/connections/aoaibymi-cog-dmauu4o3w36h6-forwizard",
+                    "connectionProperties": {
+                        "authentication": {
+                            "type": "ManagedServiceIdentity"
+                        }
+                    }
+                },
+                "sharepointonline_template": {
+                    "id": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/providers/Microsoft.Web/locations/eastus/managedApis/sharepointonline",
+                    "connectionId": "/subscriptions/8becdd94-e61c-4015-8a7b-0eb4f0722c86/resourceGroups/rg-mt-rag-azure/providers/Microsoft.Web/connections/sharepointonline"
+                }
+            }
+        }
     }
-  },
-  "kind": "Stateful"
 }

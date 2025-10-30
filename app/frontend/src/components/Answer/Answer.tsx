@@ -112,12 +112,16 @@ export const Answer = ({
                     <Stack horizontal wrap tokens={{ childrenGap: 5 }}>
                         <span className={styles.citationLearnMore}>{t("citationWithColon")}</span>
                         {parsedAnswer.citations.map((x, i) => {
-                            const path = getCitationFilePath(x);
+                            const citationLookup = answer.context.data_points.citation_lookup || {};
+                            const path = getCitationFilePath(x, citationLookup);
                             // Strip out the image filename in parentheses if it exists
                             const strippedPath = path.replace(/\([^)]*\)$/, "");
+                            // Format citation display to show page information clearly
+                            const displayText = x.includes("#page=") ? x.replace("#page=", ` (${t("page")} `) + ")" : x;
+
                             return (
                                 <a key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(strippedPath)}>
-                                    {`${++i}. ${x}`}
+                                    {`${++i}. ${displayText}`}
                                 </a>
                             );
                         })}
