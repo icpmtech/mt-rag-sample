@@ -48,6 +48,7 @@ from approaches.approach import Approach
 from approaches.chatreadretrieveread import ChatReadRetrieveReadApproach
 from approaches.promptmanager import PromptyManager
 from approaches.retrievethenread import RetrieveThenReadApproach
+from approaches.sharepoint_approach import SharePointRetrieveThenReadApproach
 from chat_history.cosmosdb import chat_history_cosmosdb_bp
 from config import (
     CONFIG_AGENT_CLIENT,
@@ -72,6 +73,9 @@ from config import (
     CONFIG_REASONING_EFFORT_ENABLED,
     CONFIG_SEARCH_CLIENT,
     CONFIG_SEMANTIC_RANKER_DEPLOYED,
+    CONFIG_SHAREPOINT_APPROACH,
+    CONFIG_SHAREPOINT_SEARCH_CLIENT,
+    CONFIG_FEDERATED_SEARCH_ENABLED,
     CONFIG_SPEECH_INPUT_ENABLED,
     CONFIG_SPEECH_OUTPUT_AZURE_ENABLED,
     CONFIG_SPEECH_OUTPUT_BROWSER_ENABLED,
@@ -302,6 +306,7 @@ def config():
             "ragSearchImageEmbeddings": current_app.config[CONFIG_RAG_SEARCH_IMAGE_EMBEDDINGS],
             "ragSendTextSources": current_app.config[CONFIG_RAG_SEND_TEXT_SOURCES],
             "ragSendImageSources": current_app.config[CONFIG_RAG_SEND_IMAGE_SOURCES],
+            "sharepointEnabled": current_app.config.get(CONFIG_SHAREPOINT_APPROACH) is not None,
         }
     )
 
@@ -395,6 +400,85 @@ async def list_uploaded(auth_claims: dict[str, Any]):
     return jsonify(files), 200
 
 
+@bp.route("/sharepoint/ask", methods=["POST"])
+@authenticated
+async def sharepoint_ask(auth_claims: dict[str, Any]):
+    """Handle SharePoint-specific questions using the sharepoint-index-2-index."""
+    sharepoint_approach = current_app.config.get(CONFIG_SHAREPOINT_APPROACH)
+    if not sharepoint_approach:
+        return jsonify({"error": "SharePoint approach not configured"}), 503
+        
+    if not request.is_json:
+        return jsonify({"error": "request must be json"}), 415
+        
+    request_json = await request.get_json()
+    context = request_json.get("context", {})
+    context["auth_claims"] = auth_claims
+    
+    try:
+        approach: Approach = cast(Approach, sharepoint_approach)
+        r = await approach.run(
+            request_json["messages"], 
+            context=context, 
+            session_state=request_json.get("session_state")
+        )
+        return jsonify(r)
+    except Exception as error:
+        return error_response(error, "/sharepoint/ask")
+
+
+@bp.route("/sharepoint/search", methods=["POST"])
+@authenticated
+async def sharepoint_search(auth_claims: dict[str, Any]):
+    """Search SharePoint documents directly without generating an answer."""
+    sharepoint_search_client = current_app.config.get(CONFIG_SHAREPOINT_SEARCH_CLIENT)
+    if not sharepoint_search_client:
+        return jsonify({"error": "SharePoint search client not configured"}), 503
+        
+    if not request.is_json:
+        return jsonify({"error": "request must be json"}), 415
+        
+    request_json = await request.get_json()
+    query = request_json.get("query", "")
+    top = request_json.get("top", 10)
+    
+    if not query:
+        return jsonify({"error": "query parameter is required"}), 400
+    
+    try:
+        # Search SharePoint index directly
+        search_results = await sharepoint_search_client.search(
+            search_text=query,
+            top=top,
+            include_total_count=True,
+            select=["id", "title", "content", "url", "author", "created_date", 
+                   "modified_date", "file_type", "site_collection", "library_name"]
+        )
+        
+        results = []
+        async for result in search_results:
+            results.append({
+                "id": result.get("id"),
+                "title": result.get("title", ""),
+                "content": result.get("content", "")[:500] + "..." if len(result.get("content", "")) > 500 else result.get("content", ""),
+                "url": result.get("url", ""),
+                "author": result.get("author", ""),
+                "created_date": result.get("created_date"),
+                "modified_date": result.get("modified_date"),
+                "file_type": result.get("file_type", ""),
+                "library_name": result.get("library_name", ""),
+                "score": result.get("@search.score", 0),
+            })
+        
+        return jsonify({
+            "results": results,
+            "total_count": len(results),
+            "query": query
+        })
+    except Exception as error:
+        return error_response(error, "/sharepoint/search")
+
+
 @bp.before_app_serving
 async def setup_clients():
     # Replace these with your own values, either in environment variables or directly here
@@ -407,6 +491,11 @@ async def setup_clients():
     AZURE_SEARCH_ENDPOINT = f"https://{AZURE_SEARCH_SERVICE}.search.windows.net"
     AZURE_SEARCH_INDEX = os.environ["AZURE_SEARCH_INDEX"]
     AZURE_SEARCH_AGENT = os.getenv("AZURE_SEARCH_AGENT", "")
+    
+    # SharePoint configuration
+    AZURE_SHAREPOINT_SEARCH_SERVICE = os.getenv("AZURE_SHAREPOINT_SEARCH_SERVICE", AZURE_SEARCH_SERVICE)
+    AZURE_SHAREPOINT_SEARCH_INDEX = os.getenv("AZURE_SHAREPOINT_SEARCH_INDEX", "sharepoint-index-2-index")
+    AZURE_SHAREPOINT_SEARCH_ENDPOINT = f"https://{AZURE_SHAREPOINT_SEARCH_SERVICE}.search.windows.net"
     # Shared by all OpenAI deployments
     OPENAI_HOST = OpenAIHost(os.getenv("OPENAI_HOST", "azure"))
     OPENAI_CHATGPT_MODEL = os.environ["AZURE_OPENAI_CHATGPT_MODEL"]
@@ -515,6 +604,13 @@ async def setup_clients():
     )
     agent_client = KnowledgeAgentRetrievalClient(
         endpoint=AZURE_SEARCH_ENDPOINT, agent_name=AZURE_SEARCH_AGENT, credential=azure_credential
+    )
+    
+    # Set up SharePoint search client
+    sharepoint_search_client = SearchClient(
+        endpoint=AZURE_SHAREPOINT_SEARCH_ENDPOINT,
+        index_name=AZURE_SHAREPOINT_SEARCH_INDEX,
+        credential=azure_credential,
     )
 
     # Set up the global blob storage manager (used for global content/images, but not user uploads)
@@ -638,6 +734,7 @@ async def setup_clients():
     current_app.config[CONFIG_SEARCH_CLIENT] = search_client
     current_app.config[CONFIG_AGENT_CLIENT] = agent_client
     current_app.config[CONFIG_AUTH_CLIENT] = auth_helper
+    current_app.config[CONFIG_SHAREPOINT_SEARCH_CLIENT] = sharepoint_search_client
 
     current_app.config[CONFIG_SEMANTIC_RANKER_DEPLOYED] = AZURE_SEARCH_SEMANTIC_RANKER != "disabled"
     current_app.config[CONFIG_QUERY_REWRITING_ENABLED] = (
@@ -721,11 +818,33 @@ async def setup_clients():
         global_blob_manager=global_blob_manager,
         user_blob_manager=user_blob_manager,
     )
+    
+    # SharePointRetrieveThenReadApproach is used for SharePoint document queries
+    current_app.config[CONFIG_SHAREPOINT_APPROACH] = SharePointRetrieveThenReadApproach(
+        search_client=sharepoint_search_client,
+        search_index_name=AZURE_SHAREPOINT_SEARCH_INDEX,
+        auth_helper=auth_helper,
+        openai_client=openai_client,
+        chatgpt_model=OPENAI_CHATGPT_MODEL,
+        chatgpt_deployment=AZURE_OPENAI_CHATGPT_DEPLOYMENT,
+        embedding_model=OPENAI_EMB_MODEL,
+        embedding_deployment=AZURE_OPENAI_EMB_DEPLOYMENT,
+        embedding_dimensions=OPENAI_EMB_DIMENSIONS,
+        embedding_field=AZURE_SEARCH_FIELD_NAME_EMBEDDING,
+        sourcepage_field=KB_FIELDS_SOURCEPAGE,
+        content_field=KB_FIELDS_CONTENT,
+        query_language=AZURE_SEARCH_QUERY_LANGUAGE,
+        query_speller=AZURE_SEARCH_QUERY_SPELLER,
+        prompt_manager=prompt_manager,
+        reasoning_effort=OPENAI_REASONING_EFFORT,
+    )
 
 
 @bp.after_app_serving
 async def close_clients():
     await current_app.config[CONFIG_SEARCH_CLIENT].close()
+    if sharepoint_search_client := current_app.config.get(CONFIG_SHAREPOINT_SEARCH_CLIENT):
+        await sharepoint_search_client.close()
     await current_app.config[CONFIG_GLOBAL_BLOB_MANAGER].close_clients()
     if user_blob_manager := current_app.config.get(CONFIG_USER_BLOB_MANAGER):
         await user_blob_manager.close_clients()

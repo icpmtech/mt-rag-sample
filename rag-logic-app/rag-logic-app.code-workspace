@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "name": "ingest-app-data",
+      "path": "./ingest-app-data"
+    }
+  ],
+  "settings": {
+    "terminal.integrated.env.windows": {
+      "PATH": "C:\\Users\\pedro.mourao.martins.CLARANET\\.azurelogicapps\\dependencies\\DotNetSDK;${env:PATH}"
+    }
+  }
+}

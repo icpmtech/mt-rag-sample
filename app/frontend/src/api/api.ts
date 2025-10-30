@@ -1,6 +1,18 @@
 const BACKEND_URI = "";
 
-import { ChatAppResponse, ChatAppResponseOrError, ChatAppRequest, Config, SimpleAPIResponse, HistoryListApiResponse, HistoryApiResponse } from "./models";
+import {
+    ChatAppResponse,
+    ChatAppResponseOrError,
+    ChatAppRequest,
+    Config,
+    SimpleAPIResponse,
+    HistoryListApiResponse,
+    HistoryApiResponse,
+    SharePointAskRequest,
+    SharePointAskResponse,
+    SharePointSearchRequest,
+    SharePointSearchResponse
+} from "./models";
 import { useLogin, getToken, isUsingAppServicesLogin } from "../authConfig";
 
 export async function getHeaders(idToken: string | undefined): Promise<Record<string, string>> {
@@ -190,4 +202,45 @@ export async function deleteChatHistoryApi(id: string, idToken: string): Promise
     if (!response.ok) {
         throw new Error(`Deleting chat history failed: ${response.statusText}`);
     }
+}
+
+// SharePoint API functions
+export async function sharePointAskApi(request: SharePointAskRequest, idToken: string | undefined): Promise<SharePointAskResponse> {
+    const headers = await getHeaders(idToken);
+    const response = await fetch(`${BACKEND_URI}/sharepoint/ask`, {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify(request)
+    });
+
+    if (response.status > 299 || !response.ok) {
+        throw Error(`SharePoint ask request failed with status ${response.status}`);
+    }
+
+    const parsedResponse = await response.json();
+    if (parsedResponse.error) {
+        throw Error(parsedResponse.error);
+    }
+
+    return parsedResponse as SharePointAskResponse;
+}
+
+export async function sharePointSearchApi(request: SharePointSearchRequest, idToken: string | undefined): Promise<SharePointSearchResponse> {
+    const headers = await getHeaders(idToken);
+    const response = await fetch(`${BACKEND_URI}/sharepoint/search`, {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify(request)
+    });
+
+    if (response.status > 299 || !response.ok) {
+        throw Error(`SharePoint search request failed with status ${response.status}`);
+    }
+
+    const parsedResponse = await response.json();
+    if (parsedResponse.error) {
+        throw Error(parsedResponse.error);
+    }
+
+    return parsedResponse as SharePointSearchResponse;
 }

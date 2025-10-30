@@ -30,6 +30,10 @@ export type ChatAppRequestOverrides = {
     search_image_embeddings: boolean;
     language: string;
     use_agentic_retrieval: boolean;
+    // SharePoint-specific options
+    library_filter?: string;
+    file_type_filter?: string | string[];
+    author_filter?: string;
 };
 
 export type ResponseMessage = {
@@ -128,4 +132,52 @@ export type HistoryApiResponse = {
     id: string;
     entra_oid: string;
     answers: any;
+};
+
+// SharePoint-specific types
+export type SharePointSearchRequest = {
+    query: string;
+    top?: number;
+};
+
+export type SharePointSearchResult = {
+    id: string;
+    title: string;
+    content: string;
+    url: string;
+    author: string;
+    created_date: string;
+    modified_date: string;
+    file_type: string;
+    library_name: string;
+    score: number;
+};
+
+export type SharePointSearchResponse = {
+    results: SharePointSearchResult[];
+    total_count: number;
+    query: string;
+};
+
+export type SharePointAskRequest = {
+    messages: ResponseMessage[];
+    context?: {
+        overrides?: ChatAppRequestOverrides;
+    };
+    session_state?: any;
+};
+
+export type SharePointAskResponse = {
+    message: ResponseMessage;
+    context: {
+        thoughts: Thoughts[];
+        data_points: DataPoints;
+        sharepoint_metadata?: {
+            source_type: string;
+            index_name: string;
+            total_sources: number;
+            document_types: string[];
+        };
+    };
+    session_state: any;
 };
