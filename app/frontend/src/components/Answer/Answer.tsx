@@ -7,11 +7,48 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 
 import styles from "./Answer.module.css";
-import { ChatAppResponse, getCitationFilePath, SpeechConfig } from "../../api";
+import { ChatAppResponse, getCitationFilePath, getOriginalDocumentUrl, SpeechConfig } from "../../api";
 import { parseAnswerToHtml } from "./AnswerParser";
 import { AnswerIcon } from "./AnswerIcon";
 import { SpeechOutputBrowser } from "./SpeechOutputBrowser";
 import { SpeechOutputAzure } from "./SpeechOutputAzure";
+
+// Helper function to get file type icons
+function getFileTypeIcon(extension: string): string {
+    switch (extension.toLowerCase()) {
+        case "pdf":
+            return "📄";
+        case "doc":
+        case "docx":
+            return "📝";
+        case "xls":
+        case "xlsx":
+            return "📊";
+        case "ppt":
+        case "pptx":
+            return "📋";
+        case "txt":
+        case "md":
+            return "📃";
+        case "jpg":
+        case "jpeg":
+        case "png":
+        case "gif":
+        case "bmp":
+        case "svg":
+            return "🖼️";
+        case "mp4":
+        case "avi":
+        case "mov":
+            return "🎥";
+        case "mp3":
+        case "wav":
+        case "ogg":
+            return "🎵";
+        default:
+            return "📁";
+    }
+}
 
 interface Props {
     answer: ChatAppResponse;
@@ -114,15 +151,45 @@ export const Answer = ({
                         {parsedAnswer.citations.map((x, i) => {
                             const citationLookup = answer.context.data_points.citation_lookup || {};
                             const path = getCitationFilePath(x, citationLookup);
+                            const originalUrl = getOriginalDocumentUrl(x, citationLookup);
                             // Strip out the image filename in parentheses if it exists
                             const strippedPath = path.replace(/\([^)]*\)$/, "");
-                            // Format citation display to show page information clearly
-                            const displayText = x.includes("#page=") ? x.replace("#page=", ` (${t("page")} `) + ")" : x;
+
+                            // Extract file extension and format display text
+                            const fileExtension = x.split(".").pop()?.toLowerCase() || "";
+                            const pageInfo = x.includes("#page=") ? x.replace("#page=", ` (${t("page")} `) + ")" : x;
+
+                            // Create enhanced display text with file type
+                            const fileTypeIcon = getFileTypeIcon(fileExtension);
+                            const displayText = `${fileTypeIcon} ${pageInfo}`;
+
+                            const citationKey = `${x}-${i}`;
+                            const citationNumber = i + 1;
 
                             return (
-                                <a key={i} className={styles.citation} title={x} onClick={() => onCitationClicked(strippedPath)}>
-                                    {`${++i}. ${displayText}`}
-                                </a>
+                                <div key={citationKey} className={styles.citationContainer}>
+                                    <a
+                                        className={styles.citation}
+                                        title={`${x} - Click to preview`}
+                                        onClick={() => onCitationClicked(strippedPath)}
+                                        onContextMenu={e => {
+                                            e.preventDefault();
+                                            window.open(originalUrl, "_blank");
+                                        }}
+                                    >
+                                        {`${citationNumber}. ${displayText}`}
+                                    </a>
+                                    <button
+                                        className={styles.citationOpenButton}
+                                        title={t("openDocument")}
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            window.open(originalUrl, "_blank");
+                                        }}
+                                    >
+                                        🔗
+                                    </button>
+                                </div>
                             );
                         })}
                     </Stack>
@@ -135,7 +202,12 @@ export const Answer = ({
                         <span className={styles.followupQuestionLearnMore}>{t("followupQuestions")}</span>
                         {followupQuestions.map((x, i) => {
                             return (
-                                <a key={i} className={styles.followupQuestion} title={x} onClick={() => onFollowupQuestionClicked(x)}>
+                                <a
+                                    key={`followup-${i}-${x.slice(0, 20)}`}
+                                    className={styles.followupQuestion}
+                                    title={x}
+                                    onClick={() => onFollowupQuestionClicked(x)}
+                                >
                                     {`${x}`}
                                 </a>
                             );

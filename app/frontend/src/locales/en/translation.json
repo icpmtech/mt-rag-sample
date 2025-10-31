@@ -54,6 +54,8 @@
     "generatingAnswer": "Generating answer",
     "citationWithColon": "Citation:",
     "followupQuestions": "Follow-up questions:",
+    "openDocument": "Open Document",
+    "refreshPreview": "Refresh Preview",
 
     "tooltips": {
         "submitQuestion": "Send message",
@@ -191,5 +193,19 @@
     "sharePointDocumentTitle": "SharePoint Document",
     "retryPreview": "Retry Preview",
     "previewError": "Preview Error",
-    "sharePointPreviewError": "Unable to load document preview. Try opening directly in SharePoint."
+    "sharePointPreviewError": "Unable to load document preview. Try opening directly in SharePoint.",
+
+    "messages": {
+        "loadingCitation": "Loading citation...",
+        "noCitationSelected": "No citation selected",
+        "citationNotAvailable": "Citation Not Available",
+        "loadingError": "Loading Error",
+        "citationNotFoundDescription": "The citation could not be found. This might be because the document is not accessible or the reference is outdated.",
+        "refresh": "Refresh"
+    },
+    "actions": {
+        "retry": "Retry",
+        "downloadFile": "Download File",
+        "refresh": "Refresh"
+    }
 }

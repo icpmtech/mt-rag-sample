@@ -182,5 +182,10 @@
 
     "overallSettings": "Configuración general",
     "searchSettings": "Configuración de búsqueda",
-    "llmSettings": "Configuración de LLM"
+    "llmSettings": "Configuración de LLM",
+
+    "messages": {
+        "loadingCitation": "Cargando citación...",
+        "noCitationSelected": "Ninguna citación seleccionada"
+    }
 }

@@ -211,7 +211,7 @@
             "value": "https://claranetapplications.sharepoint.com/sites/IT"
         },
         "SharepointLibraryName_template": {
-            "value": "LIST"
+            "value": "Shared Documents"
         },
         "$connections": {
             "type": "Object",

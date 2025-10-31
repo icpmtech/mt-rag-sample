@@ -154,5 +154,10 @@
     },
     "overallSettings": "Overordnede indstillinger",
     "searchSettings": "Søgeindstillinger",
-    "llmSettings": "LLM-indstillinger"
+    "llmSettings": "LLM-indstillinger",
+
+    "messages": {
+        "loadingCitation": "Indlæser kilde...",
+        "noCitationSelected": "Ingen kilde valgt"
+    }
 }

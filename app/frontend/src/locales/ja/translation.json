@@ -171,5 +171,10 @@
     },
     "overallSettings": "全体設定",
     "searchSettings": "検索設定",
-    "llmSettings": "LLM設定"
+    "llmSettings": "LLM設定",
+
+    "messages": {
+        "loadingCitation": "引用を読み込み中...",
+        "noCitationSelected": "引用が選択されていません"
+    }
 }

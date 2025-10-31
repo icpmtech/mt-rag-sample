@@ -174,5 +174,10 @@
 
     "overallSettings": "Genel ayarlar",
     "searchSettings": "Arama ayarları",
-    "llmSettings": "LLM ayarları"
+    "llmSettings": "LLM ayarları",
+
+    "messages": {
+        "loadingCitation": "Alıntı yükleniyor...",
+        "noCitationSelected": "Hiçbir alıntı seçilmedi"
+    }
 }

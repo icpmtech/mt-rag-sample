@@ -197,5 +197,19 @@
     "sharePointDocumentTitle": "Documento do SharePoint",
     "retryPreview": "Tentar Preview Novamente",
     "previewError": "Erro no Preview",
-    "sharePointPreviewError": "Não foi possível carregar o preview do documento. Tente abrir diretamente no SharePoint."
+    "sharePointPreviewError": "Não foi possível carregar o preview do documento. Tente abrir diretamente no SharePoint.",
+
+    "messages": {
+        "loadingCitation": "Carregando citação...",
+        "noCitationSelected": "Nenhuma citação selecionada",
+        "citationNotAvailable": "Citação Não Disponível",
+        "loadingError": "Erro de Carregamento",
+        "citationNotFoundDescription": "A citação não pôde ser encontrada. Isso pode ser porque o documento não está acessível ou a referência está desatualizada.",
+        "refresh": "Atualizar"
+    },
+    "actions": {
+        "retry": "Tentar Novamente",
+        "downloadFile": "Baixar Arquivo",
+        "refresh": "Atualizar"
+    }
 }

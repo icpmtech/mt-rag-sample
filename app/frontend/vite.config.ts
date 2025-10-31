@@ -28,17 +28,18 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            "/content/": "http://localhost:50505",
-            "/auth_setup": "http://localhost:50505",
-            "/.auth/me": "http://localhost:50505",
-            "/ask": "http://localhost:50505",
-            "/chat": "http://localhost:50505",
-            "/speech": "http://localhost:50505",
-            "/config": "http://localhost:50505",
-            "/upload": "http://localhost:50505",
-            "/delete_uploaded": "http://localhost:50505",
-            "/list_uploaded": "http://localhost:50505",
-            "/chat_history": "http://localhost:50505"
+            "/content/": "http://localhost:7000",
+            "/auth_setup": "http://localhost:7000",
+            "/.auth/me": "http://localhost:7000",
+            "/ask": "http://localhost:7000",
+            "/chat": "http://localhost:7000",
+            "/speech": "http://localhost:7000",
+            "/config": "http://localhost:7000",
+            "/upload": "http://localhost:7000",
+            "/delete_uploaded": "http://localhost:7000",
+            "/list_uploaded": "http://localhost:7000",
+            "/chat_history": "http://localhost:7000",
+            "/sharepoint/": "http://localhost:7000"
         }
     }
 });

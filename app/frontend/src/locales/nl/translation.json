@@ -174,5 +174,10 @@
 
     "overallSettings": "Algemene instellingen",
     "searchSettings": "Zoekinstellingen",
-    "llmSettings": "LLM-instellingen"
+    "llmSettings": "LLM-instellingen",
+
+    "messages": {
+        "loadingCitation": "Citatie laden...",
+        "noCitationSelected": "Geen citatie gekozen"
+    }
 }

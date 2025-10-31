@@ -182,5 +182,10 @@
 
     "overallSettings": "Paramètres généraux",
     "searchSettings": "Paramètres de recherche",
-    "llmSettings": "Paramètres LLM"
+    "llmSettings": "Paramètres LLM",
+
+    "messages": {
+        "loadingCitation": "Chargement de la citation...",
+        "noCitationSelected": "Aucune citation sélectionnée"
+    }
 }

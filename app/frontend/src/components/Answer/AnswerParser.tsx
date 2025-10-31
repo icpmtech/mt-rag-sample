@@ -41,7 +41,17 @@ export function parseAnswerToHtml(answer: ChatAppResponse, isStreaming: boolean,
                 return citation.startsWith(part);
             });
 
-            if (!isValidCitation) {
+            // If not in possibleCitations, check if it looks like a citation pattern
+            // Patterns like: EWS_API#page=33, Document#page=5, api-docs, etc.
+            const isLikeCitation =
+                part.includes("#page=") ||
+                part.includes("_API") ||
+                part.includes("-api") ||
+                part.includes("api-") ||
+                /^[A-Z_]+#page=\d+$/.test(part) ||
+                /\.(pdf|docx?|pptx?|xlsx?|txt|md)(?:#page=\d+)?$/i.test(part);
+
+            if (!isValidCitation && !isLikeCitation) {
                 return `[${part}]`;
             }
 
@@ -55,7 +65,18 @@ export function parseAnswerToHtml(answer: ChatAppResponse, isStreaming: boolean,
             const path = getCitationFilePath(part, citationLookup);
 
             return renderToStaticMarkup(
-                <a className="supContainer" title={part} onClick={() => onCitationClicked(path)}>
+                <a
+                    className="supContainer"
+                    title={part}
+                    onClick={() => onCitationClicked(path)}
+                    onContextMenu={e => {
+                        e.preventDefault();
+                        // Right-click to open in new tab
+                        if (path) {
+                            window.open(path, "_blank");
+                        }
+                    }}
+                >
                     <sup>{citationIndex}</sup>
                 </a>
             );

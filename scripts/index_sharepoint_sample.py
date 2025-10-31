@@ -35,13 +35,15 @@ async def index_sample_sharepoint_documents():
     # Create search client
     async with SearchClient(endpoint=search_endpoint, index_name=index_name, credential=credential) as search_client:
         
-        # Sample SharePoint documents
+        # Sample SharePoint documents with preview-optimized URLs
+        # Note: URLs should be formatted for optimal citation preview display
+        # The system will automatically convert these to embed URLs when needed
         sample_documents = [
             {
                 "id": "sp-doc-001",
                 "title": "Project Requirements Document",
                 "content": "This document outlines the requirements for the new customer portal project. The portal should provide customers with access to their account information, order history, and support resources. Key features include user authentication, responsive design, and integration with existing CRM systems.",
-                "url": "https://contoso.sharepoint.com/sites/projects/Documents/project-requirements.docx",
+                "url": "https://claranetapplications.sharepoint.com/sites/IT/Shared Documents/project-requirements.docx",
                 "author": "John Smith",
                 "created_date": "2024-01-15T10:30:00Z",
                 "modified_date": "2024-02-01T14:20:00Z",
@@ -57,7 +59,7 @@ async def index_sample_sharepoint_documents():
                 "id": "sp-doc-002",
                 "title": "Team Meeting Notes - Q1 2024",
                 "content": "Meeting notes from the quarterly team meeting. Discussed project milestones, budget allocations, and resource planning. Action items include updating the project timeline, reviewing vendor contracts, and scheduling follow-up meetings with stakeholders.",
-                "url": "https://contoso.sharepoint.com/sites/team/Lists/MeetingNotes/Q1-2024.aspx",
+                "url": "https://claranetapplications.sharepoint.com/sites/IT/Shared Documents/meeting-notes-q1-2024.docx",
                 "author": "Sarah Johnson",
                 "created_date": "2024-03-10T09:15:00Z",
                 "modified_date": "2024-03-12T16:45:00Z",

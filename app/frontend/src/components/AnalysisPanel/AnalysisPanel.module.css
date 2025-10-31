@@ -111,17 +111,6 @@
     padding-left: 4px;
     font-size: 12px;
     display: flex;
-    align-items: center;
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-.tokenBar {
-    height: 20px;
-    margin-bottom: 4px;
-    padding-left: 4px;
-    font-size: 12px;
-    display: flex;
     flex-wrap: wrap;
     align-items: center;
     background-color: #d7d7d7;
@@ -166,4 +155,256 @@
 .subqueriesTable td,
 .subqueriesTable tr {
     background: #fff;
+}
+
+.documentToolbar {
+    padding: 8px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.openDocumentButton {
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.openDocumentButton:hover {
+    background: #106ebe;
+}
+
+.refreshButton {
+    background: #f3f2f1;
+    color: #323130;
+    border: 1px solid #d2d0ce;
+    border-radius: 4px;
+    padding: 6px 8px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.refreshButton:hover {
+    background: #edebe9;
+}
+
+.documentContainer {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.documentIframe {
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    flex: 1;
+}
+
+.noContent {
+    padding: 20px;
+    color: #666;
+    text-align: center;
+    font-style: italic;
+}
+
+.loading {
+    padding: 20px;
+    color: #0078d4;
+    text-align: center;
+}
+
+.imageContainer {
+    padding: 10px;
+    text-align: center;
+    background: #f8f9fa;
+}
+
+.defaultViewer {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.downloadLink {
+    padding: 10px;
+    text-align: center;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+
+.downloadLink a {
+    color: #0078d4;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.downloadLink a:hover {
+    text-decoration: underline;
+}
+
+.citationIframe {
+    border: none;
+    width: 100%;
+    height: 100%;
+}
+
+.error {
+    padding: 24px;
+    color: #d13438;
+    text-align: center;
+    background: #fdf2f2;
+    border: 1px solid #f8d7da;
+    border-radius: 8px;
+    margin: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.errorIcon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    color: #d13438;
+}
+
+.errorTitle {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #721c24;
+}
+
+.errorMessage {
+    font-size: 14px;
+    margin-bottom: 16px;
+    color: #856404;
+    line-height: 1.4;
+}
+
+.retryButton {
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.retryButton:hover {
+    background: #106ebe;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 120, 212, 0.3);
+}
+
+.retryButton:active {
+    transform: translateY(0);
+}
+
+.retryButton:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.retryButton:disabled:hover {
+    background: #ccc;
+    transform: none;
+    box-shadow: none;
+}
+
+.loading {
+    padding: 40px 20px;
+    color: #0078d4;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 16px;
+}
+
+.loadingSpinner {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e3f2fd;
+    border-top: 3px solid #0078d4;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loadingText {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.noContent {
+    padding: 40px 20px;
+    color: #666;
+    text-align: center;
+    font-style: italic;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 16px;
+}
+
+.noContentIcon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #999;
+}
+
+.citationHeader {
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.citationTitle {
+    font-weight: 500;
+    color: #333;
+    word-break: break-all;
+}
+
+.citationActions {
+    display: flex;
+    gap: 8px;
+}
+
+.actionButton {
+    background: #f3f2f1;
+    color: #323130;
+    border: 1px solid #d2d0ce;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.actionButton:hover {
+    background: #edebe9;
 }

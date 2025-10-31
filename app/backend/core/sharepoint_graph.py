@@ -170,36 +170,30 @@ class SharePointGraphHelper:
     
     def get_embed_url(self, sharepoint_url: str) -> Optional[str]:
         """
-        Generate SharePoint embed URL using Doc.aspx format.
-        This works for many SharePoint documents without requiring Graph API calls.
+        Generate SharePoint embed URL using Doc.aspx format for preview.
+        This creates URLs optimized for citation preview display.
         """
         try:
             url_info = self.parse_sharepoint_url(sharepoint_url)
             if not url_info:
                 return None
             
-            # Try to extract document ID from URL or generate embed URL
-            # Format: https://tenant.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc={guid}&action=embedview
-            
-            # For now, try to construct embed URL by replacing the document path
+            # Create preview-optimized embed URL
+            # Format: https://tenant.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc=/sites/sitename/library/document&action=embedview
             base_url = f"{url_info['hostname']}"
             if not base_url.startswith('http'):
                 base_url = f"https://{base_url}"
             
-            # Simple embed URL construction
-            embed_url = sharepoint_url.replace(
-                f"/sites/{url_info['site_name']}/{url_info['library_name']}/",
-                "/_layouts/15/Doc.aspx?sourcedoc="
-            )
+            # Construct embed URL with full path for better preview compatibility
+            document_path = f"/sites/{url_info['site_name']}/{url_info['library_name']}/{url_info['file_path']}"
+            embed_url = f"{base_url}/_layouts/15/Doc.aspx?sourcedoc={document_path}&action=embedview&wdStartOn=1"
             
-            if embed_url != sharepoint_url:
-                embed_url += "&action=embedview"
-                return embed_url
+            return embed_url
             
-            return None
         except Exception as e:
             print(f"Error generating embed URL: {str(e)}")
-            return None
+            # Fallback: return original URL for direct access
+            return sharepoint_url
     
     async def get_document_metadata(self, sharepoint_url: str) -> Optional[Dict[str, Any]]:
         """Get document metadata from SharePoint using Graph API."""

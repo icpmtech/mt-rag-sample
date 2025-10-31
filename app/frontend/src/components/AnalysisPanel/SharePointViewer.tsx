@@ -8,6 +8,7 @@ import styles from "./SharePointViewer.module.css";
 
 interface Props {
     sharePointUrl: string;
+    originalUrl?: string; // Original document URL from storageUrl
     citationHeight: string;
 }
 
@@ -19,14 +20,15 @@ enum PreviewMethod {
     ERROR = "error"
 }
 
-export const SharePointViewer: React.FC<Props> = ({ sharePointUrl, citationHeight }) => {
+export const SharePointViewer: React.FC<Props> = ({ sharePointUrl, originalUrl, citationHeight }) => {
     const [previewMethod, setPreviewMethod] = useState<PreviewMethod>(PreviewMethod.LOADING);
     const [embedUrl, setEmbedUrl] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [retryCount, setRetryCount] = useState<number>(0);
 
     const { t } = useTranslation();
-    const client = useLogin ? useMsal().instance : undefined;
+    const msalInstance = useMsal();
+    const client = useLogin ? msalInstance.instance : undefined;
 
     const tryGraphAPIPreview = async (): Promise<boolean> => {
         try {
@@ -53,22 +55,42 @@ export const SharePointViewer: React.FC<Props> = ({ sharePointUrl, citationHeigh
     };
 
     const trySharePointEmbed = (): boolean => {
-        // Try to generate SharePoint embed URL
+        // Try to generate SharePoint embed URL optimized for preview
         try {
-            // Parse SharePoint URL to create embed URL
-            const url = new URL(sharePointUrl);
-            const pathParts = url.pathname.split("/");
+            // Use original URL if available, otherwise use sharePointUrl
+            const urlToUse = originalUrl || sharePointUrl;
+            const url = new URL(urlToUse);
 
-            // Find the document part (after sites/sitename/library/)
-            const sitesIndex = pathParts.findIndex(part => part === "sites");
-            if (sitesIndex >= 0 && pathParts.length > sitesIndex + 3) {
-                const siteName = pathParts[sitesIndex + 1];
-                const libraryName = pathParts[sitesIndex + 2];
-                const fileName = pathParts.slice(sitesIndex + 3).join("/");
+            // Try multiple embed URL formats for better compatibility
+            let embedUrl = "";
 
-                // Create embed URL with Doc.aspx format
-                const embedUrl = `${url.protocol}//${url.hostname}/_layouts/15/Doc.aspx?sourcedoc=/${pathParts.slice(sitesIndex).join("/")}&action=embedview`;
+            // Method 1: If it's already a Doc.aspx URL, optimize it for embed
+            if (urlToUse.includes("_layouts/15/Doc.aspx")) {
+                const urlObj = new URL(urlToUse);
+                urlObj.searchParams.set("action", "embedview");
+                urlObj.searchParams.set("wdStartOn", "1");
+                // Remove any existing action parameters that might conflict
+                urlObj.searchParams.delete("action");
+                urlObj.searchParams.set("action", "embedview");
+                embedUrl = urlObj.toString();
+            }
+            // Method 2: Direct embed view with sourcedoc for regular SharePoint URLs
+            else if (url.pathname.includes("/")) {
+                // Extract document ID if available in the original URL
+                const docIdMatch = urlToUse.match(/sourcedoc=([^&]+)/);
+                if (docIdMatch) {
+                    embedUrl = `${url.protocol}//${url.hostname}/_layouts/15/Doc.aspx?sourcedoc=${docIdMatch[1]}&action=embedview&wdStartOn=1`;
+                } else {
+                    embedUrl = `${url.protocol}//${url.hostname}/_layouts/15/Doc.aspx?sourcedoc=${encodeURIComponent(url.pathname)}&action=embedview&wdStartOn=1`;
+                }
+            }
 
+            // Method 3: Try Office Online embed format as fallback
+            if (!embedUrl) {
+                embedUrl = `${url.protocol}//${url.hostname}/_layouts/15/WopiFrame.aspx?sourcedoc=${encodeURIComponent(url.pathname)}&action=embedview`;
+            }
+
+            if (embedUrl) {
                 setEmbedUrl(embedUrl);
                 setPreviewMethod(PreviewMethod.SHAREPOINT_EMBED);
                 return true;
@@ -80,7 +102,6 @@ export const SharePointViewer: React.FC<Props> = ({ sharePointUrl, citationHeigh
             return false;
         }
     };
-
     const handleIframeError = () => {
         console.warn(`Preview method ${previewMethod} failed, trying next method`);
 
@@ -147,18 +168,37 @@ export const SharePointViewer: React.FC<Props> = ({ sharePointUrl, citationHeigh
             case PreviewMethod.SHAREPOINT_EMBED:
                 return (
                     <div className={styles.embedContainer}>
+                        <div className={styles.embedToolbar}>
+                            <button
+                                onClick={() => window.open(originalUrl || sharePointUrl, "_blank")}
+                                className={styles.openDocumentButton}
+                                title={t("openInSharePoint")}
+                            >
+                                📄 {t("openDocument")}
+                            </button>
+                            <button onClick={() => setPreviewMethod(PreviewMethod.LOADING)} className={styles.refreshButton} title={t("refreshPreview")}>
+                                🔄
+                            </button>
+                        </div>
                         <iframe
                             title="SharePoint Document Preview"
                             src={embedUrl}
                             width="100%"
-                            height={citationHeight}
+                            height={`calc(${citationHeight} - 40px)`}
                             onError={handleIframeError}
                             onLoad={handleIframeLoad}
-                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads"
                             className={styles.previewIframe}
+                            referrerPolicy="no-referrer-when-downgrade"
                         />
                         <div className={styles.previewInfo}>
-                            <small>{previewMethod === PreviewMethod.GRAPH_EMBED ? t("previewViaGraphAPI") : t("previewViaSharePointEmbed")}</small>
+                            <small>
+                                {previewMethod === PreviewMethod.GRAPH_EMBED ? t("previewViaGraphAPI") : t("previewViaSharePointEmbed")}
+                                {" • "}
+                                <a href={originalUrl || sharePointUrl} target="_blank" rel="noopener noreferrer" className={styles.directLink}>
+                                    {t("openInSharePoint")}
+                                </a>
+                            </small>
                         </div>
                     </div>
                 );
@@ -169,7 +209,7 @@ export const SharePointViewer: React.FC<Props> = ({ sharePointUrl, citationHeigh
                         <div className={styles.newTabMessage}>
                             <h4>{t("sharePointDocumentTitle")}</h4>
                             <p>{t("sharePointDocumentOpened")}</p>
-                            <button onClick={() => window.open(sharePointUrl, "_blank")} className={styles.openSharePointButton}>
+                            <button onClick={() => window.open(originalUrl || sharePointUrl, "_blank")} className={styles.openSharePointButton}>
                                 {t("openInSharePoint")}
                             </button>
                             <div className={styles.previewOptions}>
@@ -187,7 +227,7 @@ export const SharePointViewer: React.FC<Props> = ({ sharePointUrl, citationHeigh
                         <div className={styles.errorMessage}>
                             <h4>{t("previewError")}</h4>
                             <p>{errorMessage || t("sharePointPreviewError")}</p>
-                            <button onClick={() => window.open(sharePointUrl, "_blank")} className={styles.openSharePointButton}>
+                            <button onClick={() => window.open(originalUrl || sharePointUrl, "_blank")} className={styles.openSharePointButton}>
                                 {t("openInSharePoint")}
                             </button>
                             <button onClick={() => setPreviewMethod(PreviewMethod.LOADING)} className={styles.retryButton}>

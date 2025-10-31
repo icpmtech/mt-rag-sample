@@ -96,18 +96,68 @@ export function getCitationFilePath(citation: string, citationLookup?: { [key: s
     // If there are parentheses at end of citation, remove part in parentheses
     const cleanedCitation = citation.replace(/\s*\(.*?\)\s*$/, "").trim();
 
-    // Check if we have a direct SharePoint URL for this citation (try exact match first)
+    // Check if we have a direct URL for this citation (try exact match first)
     if (citationLookup && citationLookup[citation]) {
-        return citationLookup[citation];
+        const url = citationLookup[citation];
+        return processStorageUrl(url, citation);
     }
 
     // Try without page number if no exact match
     if (citationLookup && citationLookup[cleanedCitation]) {
-        return citationLookup[cleanedCitation];
+        const url = citationLookup[cleanedCitation];
+        return processStorageUrl(url, citation);
     }
 
     // For blob storage, preserve page fragment in URL
     return `${BACKEND_URI}/content/${cleanedCitation}`;
+}
+
+// Helper function to process storage URLs from the index
+function processStorageUrl(url: string, originalCitation: string): string {
+    // If it's a SharePoint URL, return as-is for now (SharePointViewer will handle optimization)
+    if (url.includes("sharepoint.com")) {
+        // Add page fragment if present in citation
+        const pageMatch = originalCitation.match(/#page=(\d+)/);
+        if (pageMatch && !url.includes("#page=")) {
+            return `${url}#page=${pageMatch[1]}`;
+        }
+        return url;
+    }
+
+    // If it's a blob storage URL, ensure it has the correct backend prefix
+    if (url.startsWith("http") && (url.includes("blob.core.windows.net") || url.includes("azurewebsites.net"))) {
+        // Add page fragment if present in citation
+        const pageMatch = originalCitation.match(/#page=(\d+)/);
+        if (pageMatch && !url.includes("#page=")) {
+            return `${url}#page=${pageMatch[1]}`;
+        }
+        return url;
+    }
+
+    // If it's a relative path, use backend content endpoint
+    const pageMatch = originalCitation.match(/#page=(\d+)/);
+    const baseUrl = `${BACKEND_URI}/content/${url}`;
+    if (pageMatch) {
+        return `${baseUrl}#page=${pageMatch[1]}`;
+    }
+    return baseUrl;
+}
+
+// Function to get the original document URL (without embed optimizations)
+export function getOriginalDocumentUrl(citation: string, citationLookup?: { [key: string]: string }): string {
+    const cleanedCitation = citation.replace(/\s*\(.*?\)\s*$/, "").trim();
+
+    // Check citation lookup first
+    if (citationLookup && citationLookup[citation]) {
+        return citationLookup[citation];
+    }
+
+    if (citationLookup && citationLookup[cleanedCitation]) {
+        return citationLookup[cleanedCitation];
+    }
+
+    // Fallback to processed URL
+    return getCitationFilePath(citation, citationLookup);
 }
 export async function uploadFileApi(request: FormData, idToken: string): Promise<SimpleAPIResponse> {
     const response = await fetch("/upload", {

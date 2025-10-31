@@ -175,5 +175,10 @@
 
     "overallSettings": "Impostazioni generali",
     "searchSettings": "Impostazioni di ricerca",
-    "llmSettings": "Impostazioni LLM"
+    "llmSettings": "Impostazioni LLM",
+
+    "messages": {
+        "loadingCitation": "Caricamento citazione...",
+        "noCitationSelected": "Nessuna citazione selezionata"
+    }
 }
