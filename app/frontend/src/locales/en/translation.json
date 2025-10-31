@@ -201,7 +201,8 @@
         "citationNotAvailable": "Citation Not Available",
         "loadingError": "Loading Error",
         "citationNotFoundDescription": "The citation could not be found. This might be because the document is not accessible or the reference is outdated.",
-        "refresh": "Refresh"
+        "refresh": "Refresh",
+        "citationLoadedSuccessfully": "Citation loaded successfully"
     },
     "actions": {
         "retry": "Retry",

@@ -56,7 +56,8 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
                 console.log("Citation lookup available:", Object.keys(citationLookup));
 
                 // Get hash from the original citation as it may contain #page=N
-                const originalHash = activeCitation.indexOf("#") !== -1 ? activeCitation.split("#")[1] : "";
+                const hashIndex = activeCitation.indexOf("#");
+                const originalHash = hashIndex !== -1 ? activeCitation.substring(hashIndex + 1) : "";
 
                 const response = await fetch(actualUrl, {
                     method: "GET",
@@ -72,7 +73,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
                     }
                     setCitation(citationObjectUrl);
                     setCitationError(null);
-                    setSuccessMessage("Citation loaded successfully");
+                    setSuccessMessage(t("messages.citationLoadedSuccessfully") || "Citation loaded successfully");
                     // Clear success message after 3 seconds
                     setTimeout(() => setSuccessMessage(null), 3000);
                 } else {
@@ -96,7 +97,15 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
         setIsLoading(false);
     };
     useEffect(() => {
-        fetchCitation();
+        if (activeCitation) {
+            fetchCitation();
+        } else {
+            setCitation("");
+            setCitationError(null);
+            setSuccessMessage(null);
+            setIsLoading(false);
+        }
+
         // Cleanup function to revoke object URLs to prevent memory leaks
         return () => {
             if (citation && citation.startsWith("blob:")) {
@@ -110,7 +119,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
             return (
                 <div className={styles.noContent}>
                     <div className={styles.noContentIcon}>📄</div>
-                    <div>{t("messages.noCitationSelected")}</div>
+                    <div>{t("messages.noCitationSelected") || "No citation selected"}</div>
                 </div>
             );
         }
@@ -120,8 +129,15 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
             return (
                 <div className={styles.error}>
                     <div className={styles.errorIcon}>⚠️</div>
-                    <div className={styles.errorTitle}>{isNotFoundError ? t("messages.citationNotAvailable") : t("messages.loadingError")}</div>
-                    <div className={styles.errorMessage}>{isNotFoundError ? t("messages.citationNotFoundDescription") : citationError}</div>
+                    <div className={styles.errorTitle}>
+                        {isNotFoundError ? t("messages.citationNotAvailable") || "Citation Not Available" : t("messages.loadingError") || "Loading Error"}
+                    </div>
+                    <div className={styles.errorMessage}>
+                        {isNotFoundError
+                            ? t("messages.citationNotFoundDescription") ||
+                              "The citation could not be found. This might be because the document is not accessible or the reference is outdated."
+                            : citationError}
+                    </div>
                     <button onClick={fetchCitation} className={styles.retryButton} disabled={isLoading}>
                         {isLoading ? "⏳" : "🔄"} {t("actions.retry") || "Retry"}
                     </button>
@@ -133,20 +149,21 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
             return (
                 <div className={styles.loading}>
                     <div className={styles.loadingSpinner}></div>
-                    <div className={styles.loadingText}>{t("messages.loadingCitation")}</div>
+                    <div className={styles.loadingText}>{t("messages.loadingCitation") || "Loading citation..."}</div>
                 </div>
             );
         }
 
         // Extract file extension from the original URL, not the blob URL
-        const fileExtension = activeCitation.split(".").pop()?.toLowerCase();
+        const lastDotIndex = activeCitation.lastIndexOf(".");
+        const fileExtension = lastDotIndex !== -1 ? activeCitation.substring(lastDotIndex + 1).toLowerCase() : "";
 
         // Render citation header with file info
         const renderCitationHeader = () => (
             <div className={styles.citationHeader}>
                 <div className={styles.citationTitle}>📄 {activeCitation}</div>
                 <div className={styles.citationActions}>
-                    <button onClick={fetchCitation} className={styles.actionButton} title={t("actions.refresh")}>
+                    <button onClick={fetchCitation} className={styles.actionButton} title={t("actions.refresh") || "Refresh"}>
                         🔄
                     </button>
                 </div>
@@ -188,7 +205,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
                             <iframe title="Citation" src={citation} width="100%" height={citationHeight} className={styles.citationIframe} />
                             <div className={styles.downloadLink}>
                                 <a href={citation} download target="_blank" rel="noopener noreferrer">
-                                    {t("actions.downloadFile")}
+                                    {t("actions.downloadFile") || "Download File"}
                                 </a>
                             </div>
                         </div>
@@ -199,6 +216,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
         return (
             <div>
                 {renderCitationHeader()}
+                {successMessage && <div className={styles.successMessage}>✅ {successMessage}</div>}
                 {citationContent}
             </div>
         );

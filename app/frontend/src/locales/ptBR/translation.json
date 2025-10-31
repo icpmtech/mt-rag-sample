@@ -205,7 +205,8 @@
         "citationNotAvailable": "Citação Não Disponível",
         "loadingError": "Erro de Carregamento",
         "citationNotFoundDescription": "A citação não pôde ser encontrada. Isso pode ser porque o documento não está acessível ou a referência está desatualizada.",
-        "refresh": "Atualizar"
+        "refresh": "Atualizar",
+        "citationLoadedSuccessfully": "Citação carregada com sucesso"
     },
     "actions": {
         "retry": "Tentar Novamente",
