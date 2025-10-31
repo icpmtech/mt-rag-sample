@@ -190,5 +190,12 @@
     "llmSettings": "Configurações LLM",
     "sharePointDocumentOpened": "Este documento está hospedado no SharePoint e será aberto em uma nova aba.",
     "openInSharePoint": "Abrir no SharePoint",
-    "page": "página"
+    "page": "página",
+    "loadingPreview": "Carregando preview do documento...",
+    "previewViaGraphAPI": "Preview via Microsoft Graph API",
+    "previewViaSharePointEmbed": "Preview via SharePoint Embed",
+    "sharePointDocumentTitle": "Documento do SharePoint",
+    "retryPreview": "Tentar Preview Novamente",
+    "previewError": "Erro no Preview",
+    "sharePointPreviewError": "Não foi possível carregar o preview do documento. Tente abrir diretamente no SharePoint."
 }

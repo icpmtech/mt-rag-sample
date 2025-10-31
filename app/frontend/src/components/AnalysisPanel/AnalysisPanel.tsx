@@ -11,6 +11,7 @@ import { useMsal } from "@azure/msal-react";
 import { getHeaders } from "../../api";
 import { useLogin, getToken } from "../../authConfig";
 import { useState, useEffect } from "react";
+import { SharePointViewer } from "./SharePointViewer";
 
 interface Props {
     className: string;
@@ -35,10 +36,9 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
     const fetchCitation = async () => {
         const token = client ? await getToken(client) : undefined;
         if (activeCitation) {
-            // Check if this is a SharePoint URL
+            // Check if this is a SharePoint URL - let SharePointViewer handle it
             if (activeCitation.includes("sharepoint.com")) {
-                // For SharePoint URLs, open directly in new tab instead of trying to embed
-                window.open(activeCitation, "_blank");
+                // SharePointViewer will handle this
                 return;
             }
 
@@ -69,16 +69,7 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
 
         // Check if this is a SharePoint URL
         if (activeCitation.includes("sharepoint.com")) {
-            return (
-                <div className={styles.citationContainer}>
-                    <div className={styles.citationMessage}>
-                        <p>{t("sharePointDocumentOpened")}</p>
-                        <button onClick={() => window.open(activeCitation, "_blank")} className={styles.openSharePointButton}>
-                            {t("openInSharePoint")}
-                        </button>
-                    </div>
-                </div>
-            );
+            return <SharePointViewer sharePointUrl={activeCitation} citationHeight={citationHeight} />;
         }
 
         const fileExtension = activeCitation.split(".").pop()?.toLowerCase();

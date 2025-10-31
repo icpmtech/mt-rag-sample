@@ -11,7 +11,9 @@ import {
     SharePointAskRequest,
     SharePointAskResponse,
     SharePointSearchRequest,
-    SharePointSearchResponse
+    SharePointSearchResponse,
+    SharePointPreviewResponse,
+    SharePointMetadataResponse
 } from "./models";
 import { useLogin, getToken, isUsingAppServicesLogin } from "../authConfig";
 
@@ -254,4 +256,44 @@ export async function sharePointSearchApi(request: SharePointSearchRequest, idTo
     }
 
     return parsedResponse as SharePointSearchResponse;
+}
+
+export async function sharePointPreviewApi(url: string, idToken: string | undefined): Promise<SharePointPreviewResponse> {
+    const headers = await getHeaders(idToken);
+    const response = await fetch(`${BACKEND_URI}/sharepoint/preview`, {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+    });
+
+    if (response.status > 299 || !response.ok) {
+        throw Error(`SharePoint preview request failed with status ${response.status}`);
+    }
+
+    const parsedResponse = await response.json();
+    if (parsedResponse.error) {
+        throw Error(parsedResponse.error);
+    }
+
+    return parsedResponse as SharePointPreviewResponse;
+}
+
+export async function sharePointMetadataApi(url: string, idToken: string | undefined): Promise<SharePointMetadataResponse> {
+    const headers = await getHeaders(idToken);
+    const response = await fetch(`${BACKEND_URI}/sharepoint/metadata`, {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+    });
+
+    if (response.status > 299 || !response.ok) {
+        throw Error(`SharePoint metadata request failed with status ${response.status}`);
+    }
+
+    const parsedResponse = await response.json();
+    if (parsedResponse.error) {
+        throw Error(parsedResponse.error);
+    }
+
+    return parsedResponse as SharePointMetadataResponse;
 }

@@ -182,3 +182,36 @@ export type SharePointAskResponse = {
     };
     session_state: any;
 };
+
+export type SharePointPreviewInfo = {
+    embed_url?: string;
+    web_url?: string;
+    download_url?: string;
+    site_id?: string;
+    item_id?: string;
+};
+
+export type SharePointPreviewResponse = {
+    success: boolean;
+    preview_info?: SharePointPreviewInfo;
+    embed_url?: string;
+    web_url?: string;
+    method?: string;
+    error?: string;
+};
+
+export type SharePointDocumentMetadata = {
+    name: string;
+    size: number;
+    created_datetime: string;
+    modified_datetime: string;
+    mime_type: string;
+    web_url: string;
+    download_url: string;
+};
+
+export type SharePointMetadataResponse = {
+    success: boolean;
+    metadata?: SharePointDocumentMetadata;
+    error?: string;
+};

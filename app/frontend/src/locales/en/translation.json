@@ -184,5 +184,12 @@
     "llmSettings": "LLM settings",
     "sharePointDocumentOpened": "This document is hosted on SharePoint and will open in a new tab.",
     "openInSharePoint": "Open in SharePoint",
-    "page": "page"
+    "page": "page",
+    "loadingPreview": "Loading document preview...",
+    "previewViaGraphAPI": "Preview via Microsoft Graph API",
+    "previewViaSharePointEmbed": "Preview via SharePoint Embed",
+    "sharePointDocumentTitle": "SharePoint Document",
+    "retryPreview": "Retry Preview",
+    "previewError": "Preview Error",
+    "sharePointPreviewError": "Unable to load document preview. Try opening directly in SharePoint."
 }

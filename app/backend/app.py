@@ -75,6 +75,7 @@ from config import (
     CONFIG_SEMANTIC_RANKER_DEPLOYED,
     CONFIG_SHAREPOINT_APPROACH,
     CONFIG_SHAREPOINT_SEARCH_CLIENT,
+    CONFIG_SHAREPOINT_GRAPH_HELPER,
     CONFIG_FEDERATED_SEARCH_ENABLED,
     CONFIG_SPEECH_INPUT_ENABLED,
     CONFIG_SPEECH_OUTPUT_AZURE_ENABLED,
@@ -479,6 +480,87 @@ async def sharepoint_search(auth_claims: dict[str, Any]):
         return error_response(error, "/sharepoint/search")
 
 
+@bp.route("/sharepoint/preview", methods=["POST"])
+@authenticated
+async def sharepoint_preview(auth_claims: dict[str, Any]):
+    """Get SharePoint document preview URLs using Graph API."""
+    auth_helper = current_app.config[CONFIG_AUTH_CLIENT]
+    sharepoint_graph = current_app.config.get(CONFIG_SHAREPOINT_GRAPH_HELPER)
+    
+    if not sharepoint_graph:
+        return jsonify({"error": "SharePoint Graph helper not configured"}), 503
+        
+    if not request.is_json:
+        return jsonify({"error": "request must be json"}), 415
+        
+    request_json = await request.get_json()
+    sharepoint_url = request_json.get("url", "")
+    
+    if not sharepoint_url:
+        return jsonify({"error": "url parameter is required"}), 400
+    
+    try:
+        # Try to get Graph API preview URL
+        preview_info = await sharepoint_graph.get_preview_url(sharepoint_url)
+        
+        if preview_info:
+            return jsonify({
+                "success": True,
+                "preview_info": preview_info,
+                "embed_url": preview_info.get("embed_url"),
+                "web_url": preview_info.get("web_url"),
+                "method": "graph_api"
+            })
+        else:
+            # Fallback to simple embed URL
+            embed_url = sharepoint_graph.get_embed_url(sharepoint_url)
+            return jsonify({
+                "success": bool(embed_url),
+                "embed_url": embed_url,
+                "web_url": sharepoint_url,
+                "method": "embed_fallback"
+            })
+            
+    except Exception as error:
+        return error_response(error, "/sharepoint/preview")
+
+
+@bp.route("/sharepoint/metadata", methods=["POST"])
+@authenticated
+async def sharepoint_metadata(auth_claims: dict[str, Any]):
+    """Get SharePoint document metadata using Graph API."""
+    sharepoint_graph = current_app.config.get(CONFIG_SHAREPOINT_GRAPH_HELPER)
+    
+    if not sharepoint_graph:
+        return jsonify({"error": "SharePoint Graph helper not configured"}), 503
+        
+    if not request.is_json:
+        return jsonify({"error": "request must be json"}), 415
+        
+    request_json = await request.get_json()
+    sharepoint_url = request_json.get("url", "")
+    
+    if not sharepoint_url:
+        return jsonify({"error": "url parameter is required"}), 400
+    
+    try:
+        metadata = await sharepoint_graph.get_document_metadata(sharepoint_url)
+        
+        if metadata:
+            return jsonify({
+                "success": True,
+                "metadata": metadata
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Unable to retrieve document metadata"
+            }), 404
+            
+    except Exception as error:
+        return error_response(error, "/sharepoint/metadata")
+
+
 @bp.before_app_serving
 async def setup_clients():
     # Replace these with your own values, either in environment variables or directly here
@@ -818,6 +900,11 @@ async def setup_clients():
         global_blob_manager=global_blob_manager,
         user_blob_manager=user_blob_manager,
     )
+    
+    # SharePoint Graph Helper for document preview and metadata
+    from core.sharepoint_graph import SharePointGraphHelper
+    sharepoint_graph_helper = SharePointGraphHelper(auth_helper)
+    current_app.config[CONFIG_SHAREPOINT_GRAPH_HELPER] = sharepoint_graph_helper
     
     # SharePointRetrieveThenReadApproach is used for SharePoint document queries
     current_app.config[CONFIG_SHAREPOINT_APPROACH] = SharePointRetrieveThenReadApproach(
