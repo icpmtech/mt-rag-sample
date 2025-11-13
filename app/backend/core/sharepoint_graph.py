@@ -76,17 +76,23 @@ class SharePointGraphHelper:
             site_path = parsed.path
             
             url = f"{self.graph_endpoint}/sites/{hostname}:{site_path}"
+            print(f"[SharePoint] Getting site ID from: {url}")
             
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers=headers) as response:
                     if response.status == 200:
                         data = await response.json()
-                        return data.get("id")
+                        site_id = data.get("id")
+                        print(f"[SharePoint] Site ID retrieved: {site_id}")
+                        return site_id
                     else:
-                        print(f"Failed to get site ID: {response.status}")
+                        error_text = await response.text()
+                        print(f"[SharePoint] Failed to get site ID: {response.status} - {error_text}")
                         return None
         except Exception as e:
-            print(f"Error getting site ID: {str(e)}")
+            print(f"[SharePoint] Error getting site ID: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return None
     
     async def get_drive_item_id(self, site_id: str, file_path: str) -> Optional[str]:
@@ -98,17 +104,23 @@ class SharePointGraphHelper:
             # Encode file path for URL
             encoded_path = file_path.replace(' ', '%20')
             url = f"{self.graph_endpoint}/sites/{site_id}/drive/root:/{encoded_path}"
+            print(f"[SharePoint] Getting drive item from: {url}")
             
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers=headers) as response:
                     if response.status == 200:
                         data = await response.json()
-                        return data.get("id")
+                        item_id = data.get("id")
+                        print(f"[SharePoint] Drive item ID retrieved: {item_id}")
+                        return item_id
                     else:
-                        print(f"Failed to get drive item ID: {response.status}")
+                        error_text = await response.text()
+                        print(f"[SharePoint] Failed to get drive item ID: {response.status} - {error_text}")
                         return None
         except Exception as e:
-            print(f"Error getting drive item ID: {str(e)}")
+            print(f"[SharePoint] Error getting drive item ID: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return None
     
     async def get_preview_url(self, sharepoint_url: str) -> Optional[Dict[str, Any]]:
@@ -198,12 +210,74 @@ class SharePointGraphHelper:
     async def get_document_metadata(self, sharepoint_url: str) -> Optional[Dict[str, Any]]:
         """Get document metadata from SharePoint using Graph API."""
         try:
+            # Clean the URL: remove any "sharepoint:" prefix and URL fragments
+            if sharepoint_url.startswith("sharepoint:"):
+                sharepoint_url = sharepoint_url[len("sharepoint:"):]
+            # Remove URL fragment (#page=1, etc.)
+            if "#" in sharepoint_url:
+                sharepoint_url = sharepoint_url.split("#")[0]
+                
+            print(f"[SharePoint] Getting metadata for: {sharepoint_url}")
+            
+            # Try using the sharepointIds API which works with web URLs directly
+            token = await self.get_graph_token()
+            headers = {"Authorization": f"Bearer {token}"}
+            
+            # Encode the SharePoint URL for the API
+            from urllib.parse import quote
+            encoded_url = quote(sharepoint_url, safe='')
+            
+            # Use the shares API which accepts web URLs
+            # Format: /shares/u!{base64encode(url)}
+            import base64
+            url_bytes = sharepoint_url.encode('utf-8')
+            encoded_sharing_url = base64.b64encode(url_bytes).decode('utf-8')
+            # Make it URL-safe base64
+            encoded_sharing_url = encoded_sharing_url.rstrip('=').replace('/', '_').replace('+', '-')
+            
+            api_url = f"{self.graph_endpoint}/shares/u!{encoded_sharing_url}/driveItem"
+            print(f"[SharePoint] Using shares API: {api_url[:80]}...")
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get(api_url, headers=headers) as response:
+                    print(f"[SharePoint] Shares API response status: {response.status}")
+                    if response.status == 200:
+                        data = await response.json()
+                        download_url = data.get("@microsoft.graph.downloadUrl")
+                        print(f"[SharePoint] Download URL obtained: {download_url is not None}")
+                        return {
+                            "name": data.get("name"),
+                            "size": data.get("size"),
+                            "created_datetime": data.get("createdDateTime"),
+                            "modified_datetime": data.get("lastModifiedDateTime"),
+                            "mime_type": data.get("file", {}).get("mimeType"),
+                            "web_url": data.get("webUrl"),
+                            "download_url": download_url
+                        }
+                    else:
+                        error_text = await response.text()
+                        print(f"[SharePoint] Shares API failed: {error_text[:200]}")
+                        
+                        # Fallback to original method
+                        print("[SharePoint] Falling back to site/drive method...")
+                        return await self._get_metadata_via_site_drive(sharepoint_url)
+        except Exception as e:
+            print(f"[SharePoint] Error getting document metadata: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return None
+    
+    async def _get_metadata_via_site_drive(self, sharepoint_url: str) -> Optional[Dict[str, Any]]:
+        """Fallback method using site/drive/item path."""
+        try:
             url_info = self.parse_sharepoint_url(sharepoint_url)
             if not url_info:
+                print("[SharePoint] Failed to parse URL")
                 return None
             
             site_id = await self.get_site_id(url_info["site_url"])
             if not site_id:
+                print(f"[SharePoint] Failed to get site_id")
                 return None
             
             file_path = url_info["full_file_path"].strip('/')
@@ -219,7 +293,6 @@ class SharePointGraphHelper:
             
             token = await self.get_graph_token()
             headers = {"Authorization": f"Bearer {token}"}
-            
             url = f"{self.graph_endpoint}/sites/{site_id}/drive/items/{item_id}"
             
             async with aiohttp.ClientSession() as session:
@@ -235,6 +308,7 @@ class SharePointGraphHelper:
                             "web_url": data.get("webUrl"),
                             "download_url": data.get("@microsoft.graph.downloadUrl")
                         }
+            return None
         except Exception as e:
-            print(f"Error getting document metadata: {str(e)}")
+            print(f"[SharePoint] Fallback method error: {str(e)}")
             return None

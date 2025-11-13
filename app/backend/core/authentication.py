@@ -245,14 +245,19 @@ class AuthenticationHelper:
                 auth_claims["groups"] = await AuthenticationHelper.list_groups(graph_resource_access_token)
             return auth_claims
         except AuthError as e:
-            logging.exception("Exception getting authorization information - " + json.dumps(e.error))
             if self.require_access_control and not self.enable_unauthenticated_access:
+                logging.exception("Exception getting authorization information - " + json.dumps(e.error))
                 raise
+            else:
+                # Debug level when auth is not required to reduce log noise
+                logging.debug("Authorization not provided - " + json.dumps(e.error))
             return {}
         except Exception:
-            logging.exception("Exception getting authorization information")
             if self.require_access_control and not self.enable_unauthenticated_access:
+                logging.exception("Exception getting authorization information")
                 raise
+            else:
+                logging.debug("Exception getting authorization information (auth not required)")
             return {}
 
     async def check_path_auth(self, path: str, auth_claims: dict[str, Any], search_client: SearchClient) -> bool:

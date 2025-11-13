@@ -43,8 +43,8 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
 
         if (activeCitation) {
             try {
-                // Import the getCitationFilePath function to convert citation to actual URL
-                const { getCitationFilePath } = await import("../../api");
+                // Import the getCitationFilePath and fetchSharePointContent functions
+                const { getCitationFilePath, fetchSharePointContent } = await import("../../api");
 
                 // Get citation lookup from answer context
                 const citationLookup = answer.context.data_points?.citation_lookup || {};
@@ -52,39 +52,61 @@ export const AnalysisPanel = ({ answer, activeTab, activeCitation, citationHeigh
                 // Convert citation (like "EWS_API#page=34") to actual storage URL
                 const actualUrl = getCitationFilePath(activeCitation, citationLookup);
 
-                console.log("Fetching citation:", activeCitation, "-> URL:", actualUrl);
+                console.log("=== CITATION DEBUG ===");
+                console.log("Original citation:", activeCitation);
+                console.log("Processed URL:", actualUrl);
                 console.log("Citation lookup available:", Object.keys(citationLookup));
+                console.log("Is SharePoint?", actualUrl.startsWith("sharepoint:"));
+                console.log("===================");
 
                 // Get hash from the original citation as it may contain #page=N
                 const hashIndex = activeCitation.indexOf("#");
                 const originalHash = hashIndex !== -1 ? activeCitation.substring(hashIndex + 1) : "";
 
-                const response = await fetch(actualUrl, {
-                    method: "GET",
-                    headers: await getHeaders(token)
-                });
+                let citationContent: Blob;
 
-                if (response.ok) {
-                    const citationContent = await response.blob();
-                    let citationObjectUrl = URL.createObjectURL(citationContent);
-                    // Add hash back to the new blob URL for PDF page navigation
-                    if (originalHash) {
-                        citationObjectUrl += "#" + originalHash;
+                // Check if this is a SharePoint URL that needs Graph API
+                if (actualUrl.startsWith("sharepoint:")) {
+                    // Remove the "sharepoint:" prefix
+                    let sharePointUrl = actualUrl.substring("sharepoint:".length);
+                    // Remove any hash fragment (#page=1, etc.) before sending to backend
+                    const hashIdx = sharePointUrl.indexOf("#");
+                    if (hashIdx !== -1) {
+                        sharePointUrl = sharePointUrl.substring(0, hashIdx);
                     }
-                    setCitation(citationObjectUrl);
-                    setCitationError(null);
-                    setSuccessMessage(t("messages.citationLoadedSuccessfully") || "Citation loaded successfully");
-                    // Clear success message after 3 seconds
-                    setTimeout(() => setSuccessMessage(null), 3000);
+                    console.log("Fetching SharePoint document via Graph API:", sharePointUrl);
+                    citationContent = await fetchSharePointContent(sharePointUrl, token);
                 } else {
-                    console.error("Failed to fetch citation:", response.status, response.statusText);
-                    const errorMessage =
-                        response.status === 404
-                            ? `Citation file not found: ${activeCitation}`
-                            : `Failed to load citation (${response.status}): ${response.statusText}`;
-                    setCitationError(errorMessage);
-                    setCitation("");
+                    // Regular fetch for blob storage or other URLs
+                    const response = await fetch(actualUrl, {
+                        method: "GET",
+                        headers: await getHeaders(token)
+                    });
+
+                    if (!response.ok) {
+                        console.error("Failed to fetch citation:", response.status, response.statusText);
+                        const errorMessage =
+                            response.status === 404
+                                ? `Citation file not found: ${activeCitation}`
+                                : `Failed to load citation (${response.status}): ${response.statusText}`;
+                        setCitationError(errorMessage);
+                        setCitation("");
+                        setIsLoading(false);
+                        return;
+                    }
+                    citationContent = await response.blob();
                 }
+
+                let citationObjectUrl = URL.createObjectURL(citationContent);
+                // Add hash back to the new blob URL for PDF page navigation
+                if (originalHash) {
+                    citationObjectUrl += "#" + originalHash;
+                }
+                setCitation(citationObjectUrl);
+                setCitationError(null);
+                setSuccessMessage(t("messages.citationLoadedSuccessfully") || "Citation loaded successfully");
+                // Clear success message after 3 seconds
+                setTimeout(() => setSuccessMessage(null), 3000);
             } catch (error) {
                 console.error("Error fetching citation:", error);
                 setCitationError(`Error loading citation: ${error instanceof Error ? error.message : "Unknown error"}`);

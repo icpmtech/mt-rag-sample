@@ -561,6 +561,79 @@ async def sharepoint_metadata(auth_claims: dict[str, Any]):
         return error_response(error, "/sharepoint/metadata")
 
 
+@bp.route("/sharepoint/content", methods=["POST"])
+@authenticated
+async def sharepoint_content(auth_claims: dict[str, Any]):
+    """Download SharePoint document content using Graph API."""
+    current_app.logger.info("=== SharePoint Content Request ===")
+    sharepoint_graph = current_app.config.get(CONFIG_SHAREPOINT_GRAPH_HELPER)
+    
+    if not sharepoint_graph:
+        current_app.logger.error("SharePoint Graph helper not configured")
+        return jsonify({"error": "SharePoint Graph helper not configured"}), 503
+        
+    if not request.is_json:
+        current_app.logger.error("Request is not JSON")
+        return jsonify({"error": "request must be json"}), 415
+        
+    request_json = await request.get_json()
+    sharepoint_url = request_json.get("url", "")
+    
+    current_app.logger.info(f"SharePoint URL requested: {sharepoint_url}")
+    
+    if not sharepoint_url:
+        return jsonify({"error": "url parameter is required"}), 400
+    
+    try:
+        # Get document metadata which includes download URL
+        current_app.logger.info("Fetching document metadata from Graph API...")
+        metadata = await sharepoint_graph.get_document_metadata(sharepoint_url)
+        current_app.logger.info(f"Metadata received: {metadata is not None}")
+        
+        if not metadata or not metadata.get("download_url"):
+            current_app.logger.error(f"No download URL found. Metadata: {metadata}")
+            return jsonify({"error": "Unable to get document download URL", "details": str(metadata)}), 404
+        
+        # Get Graph API token
+        current_app.logger.info("Getting Graph API token...")
+        token = await sharepoint_graph.get_graph_token()
+        current_app.logger.info("Token obtained successfully")
+        
+        # Download the document using the Graph API download URL
+        import aiohttp
+        headers = {"Authorization": f"Bearer {token}"}
+        download_url = metadata["download_url"]
+        current_app.logger.info(f"Downloading from: {download_url}")
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(download_url, headers=headers) as response:
+                current_app.logger.info(f"Download response status: {response.status}")
+                if response.status == 200:
+                    content = await response.read()
+                    mime_type = metadata.get("mime_type", "application/octet-stream")
+                    current_app.logger.info(f"Downloaded {len(content)} bytes, MIME type: {mime_type}")
+                    
+                    # Create a BytesIO object from the bytes
+                    import io
+                    blob_file = io.BytesIO(content)
+                    
+                    current_app.logger.info("Sending file to client...")
+                    return await send_file(
+                        blob_file,
+                        mimetype=mime_type,
+                        as_attachment=False,
+                        attachment_filename=metadata.get("name", "document")
+                    )
+                else:
+                    error_text = await response.text()
+                    current_app.logger.error(f"Download failed: {response.status} - {error_text}")
+                    return jsonify({"error": f"Failed to download document: {response.status}", "details": error_text}), response.status
+                    
+    except Exception as error:
+        current_app.logger.exception(f"Exception in sharepoint_content: {error}")
+        return error_response(error, "/sharepoint/content")
+
+
 @bp.before_app_serving
 async def setup_clients():
     # Replace these with your own values, either in environment variables or directly here

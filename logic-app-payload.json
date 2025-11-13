@@ -1,0 +1,10 @@
+{
+  "sites": [
+    {
+      "siteUrl": "https://claranetpt.sharepoint.com/sites/IT",
+      "library": "List"
+    }
+  ],
+  "mode": "modifiedSince",
+  "minutes": 5
+}

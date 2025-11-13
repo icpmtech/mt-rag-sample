@@ -108,24 +108,28 @@ export function getCitationFilePath(citation: string, citationLookup?: { [key: s
         return processStorageUrl(url, citation);
     }
 
+    // Check if the citation itself is a SharePoint URL (not in lookup)
+    if (cleanedCitation.includes("sharepoint.com")) {
+        return processStorageUrl(cleanedCitation, citation);
+    }
+
     // For blob storage, preserve page fragment in URL
     return `${BACKEND_URI}/content/${cleanedCitation}`;
 }
 
 // Helper function to process storage URLs from the index
 function processStorageUrl(url: string, originalCitation: string): string {
-    // If it's a SharePoint URL, return as-is for now (SharePointViewer will handle optimization)
+    // If it's a SharePoint URL, use the SharePoint Graph API endpoint
     if (url.includes("sharepoint.com")) {
-        // Add page fragment if present in citation
+        // Add page fragment to SharePoint URL before marking it
         const pageMatch = originalCitation.match(/#page=(\d+)/);
-        if (pageMatch && !url.includes("#page=")) {
-            return `${url}#page=${pageMatch[1]}`;
-        }
-        return url;
+        const finalUrl = pageMatch && !url.includes("#page=") ? `${url}#page=${pageMatch[1]}` : url;
+        // Store the SharePoint URL with a special prefix that will be handled by Graph API
+        return `sharepoint:${finalUrl}`;
     }
 
-    // If it's a blob storage URL, ensure it has the correct backend prefix
-    if (url.startsWith("http") && (url.includes("blob.core.windows.net") || url.includes("azurewebsites.net"))) {
+    // If it's an absolute HTTP/HTTPS URL (blob storage, etc.), return as-is (don't use /content/ endpoint)
+    if (url.startsWith("http://") || url.startsWith("https://")) {
         // Add page fragment if present in citation
         const pageMatch = originalCitation.match(/#page=(\d+)/);
         if (pageMatch && !url.includes("#page=")) {
@@ -188,6 +192,23 @@ export async function deleteUploadedFileApi(filename: string, idToken: string): 
 
     const dataResponse: SimpleAPIResponse = await response.json();
     return dataResponse;
+}
+
+export async function fetchSharePointContent(sharePointUrl: string, idToken?: string): Promise<Blob> {
+    const response = await fetch(`${BACKEND_URI}/sharepoint/content`, {
+        method: "POST",
+        headers: {
+            ...(await getHeaders(idToken)),
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ url: sharePointUrl })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch SharePoint content: ${response.statusText}`);
+    }
+
+    return await response.blob();
 }
 
 export async function listUploadedFilesApi(idToken: string): Promise<string[]> {
